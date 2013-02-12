@@ -119,7 +119,9 @@ class Server {
                 if ($requestedMethod == 'get') {
                   $data = $_GET;
                 } else {
-                  if ($_SERVER['CONTENT_TYPE'] == 'application/json') {
+                  if (isset($_SERVER['CONTENT_TYPE']) &&
+                      $_SERVER['CONTENT_TYPE'] == 'application/json') {
+                      
                     $data = json_decode(file_get_contents('php://input'), true);
                   } else {
                     parse_str(file_get_contents("php://input"), $data);
