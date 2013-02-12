@@ -27,7 +27,7 @@ $server->handleRequest();
 ?>
 ```
 
-Now, pointing your browser to http://&lt;path-to-file&gt;/example.php/service should give you the message 'Hello World'. Pointing it to http://&lt;path-to-file&gt;/example.php/service/phpREST should give you 'Hello phpREST'.
+Now, pointing your browser to http://&lt;path-to-file&gt;/service should give you the message 'Hello World'. Pointing it to http://&lt;path-to-file&gt;/service/phpREST should give you 'Hello phpREST'.
 
 .htaccess
 ---------
