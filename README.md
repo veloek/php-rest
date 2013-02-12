@@ -3,36 +3,42 @@ phpREST
 
 A REST implementation for simple setup of RESTful web services.
 
-<b>example.php</b>:
+<b>A small example</b>:
 
 ```php
 <?php
-require_once('php-rest/RESTServer.php');
+require_once('rest/Server.php');
 
-/** @Route('service') */
-class MyService {
+/** @Route('hello') */
+class HelloService extends Service {
+
   public function get($name) {
+    $response = new Response();
+    
     if ($name !== null) {
-      echo 'Hello ' . $name;
+      $response->setContent('Hello ' . $name);
     } else {
-      echo 'Hello World';
+      $response->setContent('Hello World');
     }
+    
+    return $response;
   }
+  
 }
 
-$server = new RESTServer('My Awesome Web Services');
-$server->addService(new MyService());
+$server = new Server('My Awesome Web Services');
+$server->addService(new HelloService());
 
 $server->handleRequest();
 ?>
 ```
 
-Now, pointing your browser to http://&lt;path-to-file&gt;/service should give you the message 'Hello World'. Pointing it to http://&lt;path-to-file&gt;/service/phpREST should give you 'Hello phpREST'.
+Now, pointing your browser to ``http://<path-to-file>/hello`` should give you the message ``Hello World``. Pointing it to ``http://<path-to-file>/hello/phpREST`` should give you ``Hello phpREST``.
 
 .htaccess
 ---------
 
-phpREST depends on having a ``.htaccess`` in the root folder of your web services (the folder where example.php is). This is because we are using slashes in the url and there are noe actual folders which requires some url rewriting. You need to enable mod_rewrite in apache (which is easy in some linux distros: ``a2enmod rewrite``) for this to work.
+phpREST depends on having a ``.htaccess`` in the root folder of your web services (the folder where example.php is). This is because we are using slashes in the url while there are noe actual folders, which requires some url rewriting. You need to enable ``mod_rewrite`` in apache (which is easy in some linux distros: ``a2enmod rewrite``) for this to work.
 ```
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-s
@@ -80,7 +86,9 @@ public function post($newItem) {
 ```
 The ``@AccessLevel`` annotation takes an argument defining the level, and you set the state of the request by calling ``$server->setAccessLevel(3)``.
 
-A full example with annotations:
+A full example with annotations
+-------------------------------
+
 ```php
 <?php
 require_once('rest/Server.php');
@@ -214,9 +222,9 @@ To send data to your functions, you have several choises.
 
 For GET requests, you can either use the familiar way of using ? and &, or you may simply add forward slashes with arguments.
 
-Example:
+<b>Example</b>:
 
-``http://<path-to-file>/login/root/god`` equals ``http://<path-to-file>/login?username=root&password=god`` in our example. The latter may be preferred in some cases, simply because that one lets the client decide the order of the arguments.
+``http://<path-to-file>/login/root/god`` is equal to ``http://<path-to-file>/login?username=root&password=god`` in our example. The latter may be preferred in some cases, simply because that one lets the client decide the order of the arguments.
 
 Requests with a payload, such as POST, PUT and DELETE, should have the data in the body of the request, but if that is omitted the GET parameters (in form of the classic ? and &, or with forward slashes) are used.
 
