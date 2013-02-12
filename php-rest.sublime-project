@@ -1,0 +1,15 @@
+{
+  "folders":
+  [
+    {
+      "path": "."
+    }
+  ],
+  "settings":
+  {
+    "translate_tabs_to_spaces": true,
+    "tab_size": 2,
+    "trim_automatic_white_space": false,
+    "rulers": [80]
+  }
+}
