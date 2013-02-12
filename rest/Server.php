@@ -82,7 +82,7 @@ class Server {
           $method = NULL;
           $serviceMethods = $service->getServiceMethods();
           foreach($serviceMethods as &$m) {
-            if ($m->getName() == $requestedMethod) {
+            if (strtolower($m->getName()) == $requestedMethod) {
               $method = $m;
               break;
             }
@@ -92,7 +92,7 @@ class Server {
             
             // See if the service has an "any"-method we can use instead
             foreach($serviceMethods as &$m) {
-              if ($m->getName() == 'any') {
+              if (strtolower($m->getName()) == 'any') {
                 $method = $m;
                 break;
               }

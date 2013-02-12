@@ -26,10 +26,11 @@ abstract class Service extends ReflectionAnnotatedClass {
     
     // Service methods
     foreach ($this->getMethods() as $reflectionMethod) {
-      if ($reflectionMethod->name == 'get'
-       || $reflectionMethod->name == 'post'
-       || $reflectionMethod->name == 'put'
-       || $reflectionMethod->name == 'any') {
+      if (strtolower($reflectionMethod->name) == 'get'
+       || strtolower($reflectionMethod->name) == 'post'
+       || strtolower($reflectionMethod->name) == 'put'
+       || strtolower($reflectionMethod->name) == 'delete'
+       || strtolower($reflectionMethod->name) == 'any') {
         
         $this->serviceMethods[] = new ServiceMethod($reflectionMethod);
       }
