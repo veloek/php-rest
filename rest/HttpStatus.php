@@ -49,7 +49,7 @@ class HttpStatus {
   const GATEWAY_TIMEOUT = 504;
   const HTTP_VERSION_NOT_SUPPORTED = 505;
   
-  public static function getHttpStatusMessage($status_code) {
+  public static function getMessage($status_code) {
     $ret = '';
     switch ($status_code) {
       case 100: $ret = 'Continue'; break;

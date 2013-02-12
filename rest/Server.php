@@ -202,7 +202,7 @@ class Server {
     $charset = $this->response->getCharset();
     
     $httpStatusHeader = 'HTTP/1.1 ' . $httpStatus . ' ';
-    $httpStatusHeader .= HttpStatus::getHttpStatusMessage($httpStatus);
+    $httpStatusHeader .= HttpStatus::getMessage($httpStatus);
 
     header($httpStatusHeader);
     header('Content-Type: ' . $httpContentType . ';charset=' . $charset);
@@ -217,7 +217,7 @@ class Server {
 
     if ($httpStatus !== 200) {
       $str = $httpStatus
-           . ' ' . HttpStatus::getHttpStatusMessage($httpStatus) . "\n";
+           . ' ' . HttpStatus::getMessage($httpStatus) . "\n";
       echo $str;
     }
     
