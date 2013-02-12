@@ -25,18 +25,6 @@ require_once('Annotations.php');
 require_once('Service.php');
 require_once('addendum/annotations.php');
 
-/**
- * Server
- * 
- * Usage:
- *  - Create a service class containing get/post/put/delete functions
- *    for your service
- *  - Add the service class to the REST implementation with addServiceClass()
- * 
- * @version 0.15
- * @author Vegard Løkken <vegard@loekken.org>
- * @copyright 2013
- */
 class Server {
 
   private $services;
