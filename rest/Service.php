@@ -28,7 +28,8 @@ abstract class Service extends ReflectionAnnotatedClass {
     foreach ($this->getMethods() as $reflectionMethod) {
       if ($reflectionMethod->name == 'get'
        || $reflectionMethod->name == 'post'
-       || $reflectionMethod->name == 'put') {
+       || $reflectionMethod->name == 'put'
+       || $reflectionMethod->name == 'any') {
         
         $this->serviceMethods[] = new ServiceMethod($reflectionMethod);
       }

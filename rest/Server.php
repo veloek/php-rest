@@ -50,7 +50,7 @@ class Server {
     }
   }
 
-  public function addService($service) {
+  public function addService(Service $service) {
     $this->services[] = $service;
   }
 
@@ -88,6 +88,17 @@ class Server {
             }
           }
           
+          if ($method === NULL) {
+            
+            // See if the service has an "any"-method we can use instead
+            foreach($serviceMethods as &$m) {
+              if ($m->getName() == 'any') {
+                $method = $m;
+                break;
+              }
+            }
+          }
+          
           if ($method !== NULL) {
             
             if (!$method->requiresAuthentication()
@@ -97,55 +108,66 @@ class Server {
             
                 $result = NULL;
                 if ($requestedMethod == 'get') {
-                  $data = array_slice($requestPath, 1);
-                  $result = $method->invokeArgs($service, $data);
+                  $data = $_GET;
                 } else {
-                  
                   if ($_SERVER['CONTENT_TYPE'] == 'application/json') {
                     $data = json_decode(file_get_contents('php://input'), true);
                   } else {
                     parse_str(file_get_contents("php://input"), $data);
                   }
-                  
-                  // If there is no payload, use url params (if any)
-                  if (count($data) == 0) $data = array_slice($requestPath, 1);
-                  
-                  $parameters = $method->getParameters();
-                  if (count($parameters) > 0) {
-                    $paramClass = $parameters[0]->getClass();
-                    if ($paramClass !== NULL) {
-                      $paramClassName = $paramClass->name;
-                  
-                      $requestObj = new $paramClassName();
-                      $classVars = get_class_vars($paramClassName);
-                      foreach ($classVars as $attr=>$defaultVal) {
-                        if (isset($data[$attr])) {
-                          $requestObj->{$attr} = $data[$attr];
-                        }
+                  if (count($data) == 0) $data = $_GET;
+                }
+                
+                // If there is no payload, use url params (if any)
+                if (count($data) == 0) $data = array_slice($requestPath, 1);
+                
+                $parameters = $method->getParameters();
+                if (count($parameters) > 0) {
+                  $paramClass = $parameters[0]->getClass();
+                  if ($paramClass !== NULL) {
+                    $paramClassName = $paramClass->name;
+                    
+                    $requestObj = new $paramClassName();
+                    $classVars = get_class_vars($paramClassName);
+                    foreach ($classVars as $attr=>$defaultVal) {
+                      if (isset($data[$attr])) {
+                        $requestObj->{$attr} = $data[$attr];
                       }
-                      
-                      $result = $method->invoke($service, $requestObj);
-                    } else {
-                      
-                      // Try to make each param come in right order
-                      $input = array();
-                      foreach($parameters as $param) {
-                        if (isset($data[$param->name])) {
-                          $input[] = $data[$param->name];
+                    }
+                    
+                    $result = $method->invoke($service, $requestObj);
+                  } else {
+                    
+                    // Try to make each param come in right order
+                    $input = array();
+                    foreach($parameters as $param) {
+                      if (isset($data[$param->name])) {
+                        $input[] = $data[$param->name];
+                        unset($data[$param->name]);
+                      } else {
+                        $input[] = NULL;
+                      }
+                    }
+                    
+                    // Try to fill in the blanks with unnamed data fields
+                    foreach ($input as $key=>&$inputData) {
+                      if ($inputData === NULL) {
+                        $anonymous = array_shift($data);
+                        
+                        if ($anonymous !== NULL) {
+                          $inputData = $anonymous;
                         } else {
-                          if ($param->isOptional()) {
-                            $input[] = $param->getDefaultValue();
-                          } else {
-                            $input[] = null;
+                          if ($parameters[$key]->isOptional()) {
+                            $inputData = $parameters[$key]->getDefaultValue();
                           }
                         }
                       }
-                      
-                      $result = $method->invokeArgs($service, $input);
                     }
-                  } else {
-                    $result = $method->invoke($service);
+                    
+                    $result = $method->invokeArgs($service, $input);
                   }
+                } else {
+                  $result = $method->invoke($service);
                 }
                 
                 if ($result !== NULL && $result instanceof Response) {

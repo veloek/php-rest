@@ -12,8 +12,8 @@ class Response {
   private $charset;
 
   public function __construct($content = '',
-            $contentType = 'text/plain',
             $httpStatus = HttpStatus::OK,
+            $contentType = 'text/plain',
             $charset = 'utf-8') {
     $this->content = $content;
     $this->contentType = $contentType;
