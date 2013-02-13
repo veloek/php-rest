@@ -63,53 +63,51 @@ class HttpStatus {
   const GATEWAY_TIMEOUT = 504;
   const HTTP_VERSION_NOT_SUPPORTED = 505;
   
-  public static function getMessage($status_code) {
-    $ret = '';
-    switch ($status_code) {
-      case 100: $ret = 'Continue'; break;
-      case 101: $ret = 'Switching Protocols'; break;
-      case 200: $ret = 'OK'; break;
-      case 201: $ret = 'Created'; break;
-      case 202: $ret = 'Accepted'; break;
-      case 203: $ret = 'Non-Authoritative Information'; break;
-      case 204: $ret = 'No Content'; break;
-      case 205: $ret = 'Reset Content'; break;
-      case 206: $ret = 'Partial Content'; break;
-      case 300: $ret = 'Multiple Choices'; break;
-      case 301: $ret = 'Moved Permanently'; break;
-      case 302: $ret = 'Found'; break;
-      case 303: $ret = 'See Other'; break;
-      case 304: $ret = 'Not Modified'; break;
-      case 305: $ret = 'Use Proxy'; break;
-      case 306: $ret = '(Unused)'; break;
-      case 307: $ret = 'Temporary Redirect'; break;
-      case 400: $ret = 'Bad Request'; break;
-      case 401: $ret = 'Unauthorized'; break;
-      case 402: $ret = 'Payment Required'; break;
-      case 403: $ret = 'Forbidden'; break;
-      case 404: $ret = 'Not Found'; break;
-      case 405: $ret = 'Method Not Allowed'; break;
-      case 406: $ret = 'Not Acceptable'; break;
-      case 407: $ret = 'Proxy Authentication Required'; break;
-      case 408: $ret = 'Request Timeout'; break;
-      case 409: $ret = 'Conflict'; break;
-      case 410: $ret = 'Gone'; break;
-      case 411: $ret = 'Length Required'; break;
-      case 412: $ret = 'Precondition Failed'; break;
-      case 413: $ret = 'Request Entity Too Large'; break;
-      case 414: $ret = 'Request-URI Too Long'; break;
-      case 415: $ret = 'Unsupported Media Type'; break;
-      case 416: $ret = 'Requested Range Not Satisfiable'; break;
-      case 417: $ret = 'Expectation Failed'; break;
-      case 500: $ret = 'Internal Server Error'; break;
-      case 501: $ret = 'Not Implemented'; break;
-      case 502: $ret = 'Bad Gateway'; break;
-      case 503: $ret = 'Service Unavailable'; break;
-      case 504: $ret = 'Gateway Timeout'; break;
-      case 505: $ret = 'HTTP Version Not Supported'; break;
-      default: $ret = 'Unknown'; break;
+  public static function getMessage($statusCode) {
+    switch ($statusCode) {
+      case self::CONT: return 'Continue';
+      case self::SWITCHING_PROTOCOLS: return 'Switching Protocols';
+      case self::OK: return 'OK';
+      case self::CREATED: return 'Created';
+      case self::ACCEPTED: return 'Accepted';
+      case self::NON_AUTHORITATIVE_INFORMATION: return 'Non-Authoritative Information';
+      case self::NO_CONTENT: return 'No Content';
+      case self::RESET_CONTENT: return 'Reset Content';
+      case self::PARTIAL_CONTENT: return 'Partial Content';
+      case self::MULTIPLE_CHOICES: return 'Multiple Choices';
+      case self::MOVED_PERMANENTLY: return 'Moved Permanently';
+      case self::FOUND: return 'Found';
+      case self::SEE_OTHER: return 'See Other';
+      case self::NOT_MODIFIED: return 'Not Modified';
+      case self::USE_PROXY: return 'Use Proxy';
+      case self::UNUSED: return '(Unused)';
+      case self::TEMPORARY_REDIRECT: return 'Temporary Redirect';
+      case self::BAD_REQUEST: return 'Bad Request';
+      case self::UNAUTHORIZED: return 'Unauthorized';
+      case self::PAYMENT_REQUIRED: return 'Payment Required';
+      case self::FORBIDDEN: return 'Forbidden';
+      case self::NOT_FOUND: return 'Not Found';
+      case self::METHOD_NOT_ALLOWED: return 'Method Not Allowed';
+      case self::NOT_ACCEPTABLE: return 'Not Acceptable';
+      case self::PROXY_AUTHENTICATION_REQUIRED: return 'Proxy Authentication Required';
+      case self::REQUEST_TIMEOUT: return 'Request Timeout';
+      case self::CONFLICT: return 'Conflict';
+      case self::GONE: return 'Gone';
+      case self::LENGTH_REQUIRED: return 'Length Required';
+      case self::PRECONDITION_FAILED: return 'Precondition Failed';
+      case self::REQUEST_ENTITY_TOO_LARGE: return 'Request Entity Too Large';
+      case self::REQUEST_URI_TOO_LONG: return 'Request-URI Too Long';
+      case self::UNSUPPORTED_MEDIA_TYPE: return 'Unsupported Media Type';
+      case self::REQUESTED_RANGE_NOT_SATISFIABLE: return 'Requested Range Not Satisfiable';
+      case self::EXPECTATION_FAILED: return 'Expectation Failed';
+      case self::INTERNAL_SERVER_ERROR: return 'Internal Server Error';
+      case self::NOT_IMPLEMENTED: return 'Not Implemented';
+      case self::BAD_GATEWAY: return 'Bad Gateway';
+      case self::SERVICE_UNAVAILABLE: return 'Service Unavailable';
+      case self::GATEWAY_TIMEOUT: return 'Gateway Timeout';
+      case self::HTTP_VERSION_NOT_SUPPORTED: return 'HTTP Version Not Supported';
+      default: return 'Unknown';
     }
-    return $ret;
   }
 }
 
