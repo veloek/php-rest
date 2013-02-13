@@ -75,47 +75,24 @@ class Server {
 
         $requestedService = $requestPath[0];
         
-
-        // Find the service
-        $service = NULL;
-        foreach ($this->services as &$s) {
-          if ($s->getRoute() == $requestedService) {
-            $service = $s;
-            break;
-          }
-        }
+        $service = $this->findService($requestedService);
           
         if ($service !== NULL) {
             
-          // Check if the service has this method
-          $method = NULL;
-          $serviceMethods = $service->getServiceMethods();
-          foreach($serviceMethods as &$m) {
-            if (strtolower($m->getName()) == $requestedMethod) {
-              $method = $m;
-              break;
-            }
-          }
-          
-          if ($method === NULL) {
-            
-            // See if the service has an "any"-method we can use instead
-            foreach($serviceMethods as &$m) {
-              if (strtolower($m->getName()) == 'any') {
-                $method = $m;
-                break;
-              }
-            }
-          }
+          $method = $this->findMethod($service, $requestedMethod);
           
           if ($method !== NULL) {
             
+            // Check for use of annotation @Authenticated
             if (!$method->requiresAuthentication()
              || ($method->requiresAuthentication() && $this->isAuthenticated())) {
               
+              // Check for use of annotation @AccessLevel
               if ($this->getAccessLevel() >= $method->requiredAccessLevel()) {
-            
+                
                 $result = NULL;
+                
+                // Get data out of the request
                 if ($requestedMethod == 'get') {
                   $data = $_GET;
                 } else {
@@ -132,9 +109,13 @@ class Server {
                 // If there is no payload, use url params (if any)
                 if (count($data) == 0) $data = array_slice($requestPath, 1);
                 
+                // Analyze the service method and invoke it "the best way"(tm)
                 $parameters = $method->getParameters();
                 if (count($parameters) > 0) {
                   $paramClass = $parameters[0]->getClass();
+                  
+                  // If the method takes a special object, we try to create an
+                  // object of this kind and fill it with data from the request
                   if ($paramClass !== NULL) {
                     $paramClassName = $paramClass->name;
                     
@@ -147,6 +128,9 @@ class Server {
                     }
                     
                     $result = $method->invoke($service, $requestObj);
+                    
+                  // If no object, we try to rearrange the request data to
+                  // match paramter names in the method
                   } else {
                     
                     // Try to make each param come in right order
@@ -160,7 +144,7 @@ class Server {
                       }
                     }
                     
-                    // Try to fill in the blanks with unnamed data fields
+                    // Try to fill in the blanks with unnamed request data
                     foreach ($input as $key=>&$inputData) {
                       if ($inputData === NULL) {
                         $anonymous = array_shift($data);
@@ -205,6 +189,43 @@ class Server {
     }
       
     $this->sendResponse();
+  }
+  
+  // Find the service
+  private function findService($service) {
+    $found = NULL;
+    foreach ($this->services as &$s) {
+      if ($s->getRoute() == $service) {
+        $found = $s;
+        break;
+      }
+    }
+    return $found;
+  }
+  
+  // Check if the service has this method
+  private function findMethod(Service $service, $method) {
+    $found = NULL;
+    $serviceMethods = $service->getServiceMethods();
+    foreach($serviceMethods as &$m) {
+      if (strtolower($m->getName()) == $method) {
+        $found = $m;
+        break;
+      }
+    }
+    
+    // Last solution
+    if ($found === NULL) {
+      
+      // See if the service has an "any"-method we can use instead
+      foreach($serviceMethods as &$m) {
+        if (strtolower($m->getName()) == 'any') {
+          $found = $m;
+          break;
+        }
+      }
+    }
+    return $found;
   }
 
   private function sendResponse() {
