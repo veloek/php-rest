@@ -15,7 +15,7 @@ class HelloService extends Service {
   public function get($name) {
     $response = new Response();
     
-    if ($name !== null) {
+    if ($name !== NULL) {
       $response->setContent('Hello ' . $name);
     } else {
       $response->setContent('Hello World');
