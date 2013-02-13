@@ -239,7 +239,7 @@ class Server {
     ';
     
     foreach ($this->services as $service) {
-      $ret .= '<li>/' . $service->getRoute() . ' (';
+      $ret .= '<li>/<a href="'.$service->getRoute().'">' . $service->getRoute() . '</a> (';
       
       $serviceMethods = $service->getServiceMethods();
       foreach ($serviceMethods as $method) {
