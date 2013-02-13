@@ -40,14 +40,21 @@ Now, pointing your browser to ``http://<path-to-file>/hello`` should give you th
 
 phpREST depends on having a ``.htaccess`` in the root folder of your web services (the folder where example.php is). This is because we are using slashes in the url while there are noe actual folders, which requires some url rewriting. You need to enable ``mod_rewrite`` in apache (which is easy in some linux distros: ``a2enmod rewrite``) for this to work.
 ```
+# Rewrite rule to enable use of forward slash
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-s
 RewriteCond %{REQUEST_FILENAME} !-l 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/example\.php$
 RewriteRule ^(.*)$ example.php/$1
+
+# Set index file
+DirectoryIndex example.php
+
+# Remove indexing
+Options -Indexes
 ```
-You need to change ``example.php`` in that file to whatever you call your base file.
+You need to change every ``example.php`` in that file to whatever you call your index file.
 
 Annotations
 -----------
