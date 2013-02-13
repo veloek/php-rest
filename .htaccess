@@ -1,6 +1,13 @@
+# Rewrite rule to enable use of forward slash
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-s
 RewriteCond %{REQUEST_FILENAME} !-l 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/example\.php$
 RewriteRule ^(.*)$ example.php/$1
+
+# Set index file
+DirectoryIndex example.php
+
+# Remove indexing
+Options -Indexes
