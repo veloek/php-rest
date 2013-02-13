@@ -27,12 +27,14 @@ require_once('addendum/annotations.php');
 
 class Server {
 
+  private $serverName;
   private $services;
   private $response;
   private $authenticated;
   private $accessLevel;
   
-  public function __construct() {
+  public function __construct($serverName='phpREST Services') {
+    $this->serverName = $serverName;
     $this->services = array();
     $this->response = new Response();
     $this->authenticated = false;
@@ -60,7 +62,8 @@ class Server {
   }
 
   public function addService(Service $service) {
-    $this->services[] = $service;
+    if (count($service->getServiceMethods()) > 0)
+      $this->services[] = $service;
   }
 
   public function handleRequest() {
@@ -183,8 +186,8 @@ class Server {
           $this->response->setHttpStatus(HttpStatus::NOT_FOUND);
         }
       } else {
-        $this->response->setHttpStatus(HttpStatus::BAD_REQUEST);
-        $this->response->setContent('No service specified');
+        $this->response->setContentType('text/html');
+        $this->response->setContent($this->createIndex());
       }
     }
       
@@ -226,6 +229,36 @@ class Server {
       }
     }
     return $found;
+  }
+  
+  private function createIndex() {
+    $ret = '
+    <h2>Welcome to <em>' . $this->serverName . '</em></h2>
+    <p>The following services are available:</p>
+    <ul>
+    ';
+    
+    foreach ($this->services as $service) {
+      $ret .= '<li>/' . $service->getRoute() . ' (';
+      
+      $serviceMethods = $service->getServiceMethods();
+      foreach ($serviceMethods as $method) {
+        $ret .= $method->getName() . ', ';
+      }
+      $ret = substr($ret, 0, -2); // Remove last ,
+      
+      $ret .= ')</li>';
+    }
+    
+    $ret .= '
+    </ul>
+    <p><em>This REST server is powered by
+    <a href="https://github.com/veloek/php-rest">phpREST</a>
+    </em>
+    </p>
+    ';
+    
+    return $ret;
   }
 
   private function sendResponse() {
