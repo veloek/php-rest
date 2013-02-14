@@ -231,31 +231,57 @@ class Server {
     return $found;
   }
   
+  // When no route is specified, the output from this function is shown
   private function createIndex() {
     $ret = '
-    <h2>Welcome to <em>' . $this->serverName . '</em></h2>
+    <style>
+    *{font-family: Helvetica, Arial}
+    li{margin:10px 0}
+    .method{width:50px;border-radius:5px;border:solid black 1px;margin:0 3px;padding: 2px;font-size: 0.9em;}
+    .get{background:#4DAB58}
+    .post{background:#CC9900}
+    .put{background:#3060F0}
+    .delete{background:#C03000}
+    .any{background:#F6358A}
+    </style>
+    <div style="width:500px;margin:0 auto">
+    <br>
+    <h2 style="text-decoration:underline;">
+    Welcome to <em>' . $this->serverName . '</em>
+    </h2>
     <p>The following services are available:</p>
     <ul>
     ';
     
+    // For each service; print out it's service methods
     foreach ($this->services as $service) {
-      $ret .= '<li>/<a href="'.$service->getRoute().'">' . $service->getRoute() . '</a> (';
+      $ret .= '<li>/<a href="'.$service->getRoute().'">' . $service->getRoute() . '</a> ';
       
       $serviceMethods = $service->getServiceMethods();
+      $methodNames = array();
       foreach ($serviceMethods as $method) {
-        $ret .= $method->getName() . ', ';
+        $methodNames[] = strtolower($method->getName());
+      }
+      sort($methodNames);
+      
+      foreach ($methodNames as $method) {
+        $ret .= '<span class="method '.$method.'">'
+              . strtoupper($method)
+              . '</span>';
       }
       $ret = substr($ret, 0, -2); // Remove last ,
       
-      $ret .= ')</li>';
+      $ret .= '</li>';
     }
     
     $ret .= '
     </ul>
-    <p><em>This REST server is powered by
+    <br>
+    <p style="font-size:0.8em;"><em>This REST server is powered by
     <a href="https://github.com/veloek/php-rest">phpREST</a>
     </em>
     </p>
+    </div>
     ';
     
     return $ret;
