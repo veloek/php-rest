@@ -33,7 +33,7 @@ class Server {
   private $authenticated;
   private $accessLevel;
   
-  public function __construct($serverName='phpREST Services') {
+  public function Server($serverName='phpREST Services') {
     $this->serverName = $serverName;
     $this->services = array();
     $this->response = new Response();

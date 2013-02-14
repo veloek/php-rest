@@ -29,10 +29,10 @@ class Response {
   private $httpStatus;
   private $charset;
 
-  public function __construct($content = '',
-                              $httpStatus = HttpStatus::OK,
-                              $contentType = 'text/plain',
-                              $charset = 'utf-8') {
+  public function Response($content = '',
+                           $httpStatus = HttpStatus::OK,
+                           $contentType = 'text/plain',
+                           $charset = 'utf-8') {
     
     $this->content = $content;
     $this->contentType = $contentType;
