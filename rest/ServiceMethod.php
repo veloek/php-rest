@@ -37,8 +37,9 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
     
     if ($this->hasAnnotation('AccessLevel')) {
       $annotation = $this->getAnnotation('AccessLevel');
-      if ($annotation->value) {
-        $this->requiredAccessLevel = $annotation->value;
+      $value = intval($annotation->value);
+      if ($value) {
+        $this->requiredAccessLevel = $value;
       }
     }
   }
