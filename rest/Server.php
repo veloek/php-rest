@@ -49,6 +49,8 @@ class Server {
   public function setAuthenticated($value) {
     if (is_bool($value)) {
       $this->authenticated = $value;
+    } else {
+      throw new Exception('Authenticated value must be of boolean type');
     }
   }
   
@@ -59,6 +61,8 @@ class Server {
   public function setAccessLevel($level) {
     if (is_int($level)) {
       $this->accessLevel = $level;
+    } else {
+      throw new Exception('Access level must be of integer type');
     }
   }
 
