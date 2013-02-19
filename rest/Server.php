@@ -190,6 +190,7 @@ class Server {
                   } else {
                     $this->response->setHttpStatus(
                       HttpStatus::INTERNAL_SERVER_ERROR);
+                    $this->response->setContent($result->getMessage());
                   }
                 } else {
                   $this->response->setContentType($method->getContentType());
