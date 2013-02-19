@@ -29,13 +29,12 @@ class Request {
   
   public function Request($phpRequest) {
     
-    $this->method = @$_SERVER['REQUEST_METHOD'] ?: '';
+    $this->method = @$_SERVER['REQUEST_METHOD'] ? $_SERVER['REQUEST_METHOD'] : '';
     
     $requestPath = explode("/", substr(@$_SERVER['PATH_INFO'], 1));
-    $this->service = @$requestPath[0] ?: '';
+    $this->service = @$requestPath[0] ? $requestPath[0] : '';
     
-    // array_filter removes empty strings for us
-    $this->anonymousData = array_filter(array_slice($requestPath, 1));
+    $this->anonymousData = self::removeEmptyStrings(array_slice($requestPath, 1));
     
     if ($this->getMethod() == 'GET') {
       
@@ -73,6 +72,15 @@ class Request {
   
   public function getAnonymousData() {
     return $this->anonymousData;
+  }
+  
+  private static function removeEmptyStrings($arr) {
+    if (is_array($arr)) {
+      foreach ($arr as $key=>$val) {
+        if ($val == '') unset($arr[$key]);
+      }
+    }
+    return $arr;
   }
   
 }
