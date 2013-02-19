@@ -183,9 +183,14 @@ class Server {
                   }
                 }
                 
-                if ($result instanceof ServiceException) {
-                  $this->response->setHttpStatus($result->getCode());
-                  $this->response->setContent($result->getMessage());
+                if ($result instanceof Exception) {
+                  if ($result instanceof ServiceException) {
+                    $this->response->setHttpStatus($result->getCode());
+                    $this->response->setContent($result->getMessage());
+                  } else {
+                    $this->response->setHttpStatus(
+                      HttpStatus::INTERNAL_SERVER_ERROR);
+                  }
                 } else {
                   $this->response->setContentType($method->getContentType());
                   
