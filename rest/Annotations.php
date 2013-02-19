@@ -25,5 +25,6 @@ require_once('addendum/annotations.php');
 class Route extends Annotation {}
 class Authenticated extends Annotation {}
 class AccessLevel extends Annotation {}
+class ContentType extends Annotation {}
 
 ?>

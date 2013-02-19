@@ -49,7 +49,7 @@ abstract class Service extends ReflectionAnnotatedClass {
        || strtolower($reflectionMethod->name) == 'delete'
        || strtolower($reflectionMethod->name) == 'any') {
         
-        $this->serviceMethods[] = new ServiceMethod($reflectionMethod);
+        $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod);
       }
     }
   }

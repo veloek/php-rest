@@ -22,17 +22,28 @@
 require_once('addendum/annotations.php');
 
 class ServiceMethod extends ReflectionAnnotatedMethod {
+  private $reflectionClass;
   private $requiresAuthentication;
   private $requiredAccessLevel;
+  private $contentType;
   
-  public function ServiceMethod(&$reflectionMethod) {
+  public function ServiceMethod(&$reflectionClass, &$reflectionMethod) {
     parent::__construct($reflectionMethod->class, $reflectionMethod->name);
+    
+    $this->reflectionClass = $reflectionClass;
     $this->requiresAuthentication = false;
     $this->requiredAccessLevel = 0;
+    $this->contentType = 'text/plain';
     
     // Annotations
     if ($this->hasAnnotation('Authenticated')) {
       $this->requiresAuthentication = true;
+    } else {
+      
+      // Check if service class has global settings
+      if ($this->reflectionClass->hasAnnotation('Authenticated')) {
+        $this->requiresAuthentication = true;
+      }
     }
     
     if ($this->hasAnnotation('AccessLevel')) {
@@ -40,6 +51,34 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
       $value = intval($annotation->value);
       if ($value) {
         $this->requiredAccessLevel = $value;
+      }
+    } else {
+      
+      // Check if service class has global settings
+      if ($this->reflectionClass->hasAnnotation('AccessLevel')) {
+        $annotation = $this->reflectionClass->getAnnotation('AccessLevel');
+        $value = intval($annotation->value);
+        if ($value) {
+          $this->requiredAccessLevel = $value;
+        }
+      }
+    }
+    
+    if ($this->hasAnnotation('ContentType')) {
+      $annotation = $this->getAnnotation('ContentType');
+      $value = $annotation->value;
+      if ($value) {
+        $this->contentType = $value;
+      }
+    } else {
+      
+      // Check if service class has global settings
+      if ($this->reflectionClass->hasAnnotation('ContentType')) {
+        $annotation = $this->reflectionClass->getAnnotation('ContentType');
+        $value = $annotation->value;
+        if ($value) {
+          $this->contentType = $value;
+        }
       }
     }
   }
@@ -50,6 +89,10 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
   
   public function requiredAccessLevel() {
     return $this->requiredAccessLevel;
+  }
+  
+  public function getContentType() {
+    return $this->contentType;
   }
 }
 
