@@ -24,6 +24,7 @@ require_once('Response.php');
 require_once('Request.php');
 require_once('Annotations.php');
 require_once('Service.php');
+require_once('ServiceException.php');
 require_once('addendum/annotations.php');
 
 class Server {
@@ -121,7 +122,11 @@ class Server {
                       }
                     }
                     
-                    $result = $method->invoke($service, $requestObj);
+                    try {
+                      $result = $method->invoke($service, $requestObj);
+                    } catch (ServiceException $e) {
+                      $result = $e;
+                    }
                     
                   /* If no object, we try to rearrange the request data to
                    * match paramter names in the method
@@ -164,16 +169,29 @@ class Server {
                       }
                     }
                     
-                    $result = $method->invokeArgs($service, $input);
+                    try {
+                      $result = $method->invokeArgs($service, $input);
+                    } catch (ServiceException $e) {
+                      $result = $e;
+                    }
                   }
                 } else {
-                  $result = $method->invoke($service);
+                  try {
+                    $result = $method->invoke($service);
+                  } catch (ServiceException $e) {
+                    $result = $e;
+                  }
                 }
                 
-                if ($result !== NULL && $result instanceof Response) {
-                  $this->response = $result;
+                if ($result instanceof ServiceException) {
+                  $this->response->setHttpStatus($result->getCode());
+                  $this->response->setContent($result->getMessage());
                 } else {
-                  $this->response->setHttpStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                  $this->response->setContentType($method->getContentType());
+                  
+                  if ($result !== NULL) {
+                    $this->response->setContent($result);
+                  }
                 }
               } else {
                 $this->response->setHttpStatus(HttpStatus::METHOD_NOT_ALLOWED);
