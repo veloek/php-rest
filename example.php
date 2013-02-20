@@ -1,5 +1,5 @@
 <?php
-require_once('rest/Server.php');
+require_once('rest'.DIRECTORY_SEPARATOR.'Server.php');
 
 /**
  * example.php
@@ -42,7 +42,21 @@ session_start();
  */
 class LoginService extends Service {
 
-  public function any($username, $password) {
+  /**
+   * This service method demonstrates a method with a custom name.
+   * If the name is not get, post, put, delete or any, we must use
+   * annotation(s) to specify the http method.
+   *
+   * Example paths:
+   * /login/john/doe
+   * /login?username=john&password=doe
+   * /login/john (with POST-data: {"password": "doe"})
+   * /login (with POST-data: {"username": "john", password": "doe"})
+   *
+   * @Get
+   * @Post
+   */
+  public function login($username, $password) {
     
     // Throw a bad request if username or password is missing
     if ($username === NULL || $password === NULL) {
