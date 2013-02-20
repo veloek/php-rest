@@ -256,22 +256,32 @@ class Server {
       }
     }
     
+    // Find the method that matches argument list best
     if (count($validMethods) > 0) {
       if (count($validMethods) > 1) {
-        
-        // Find the method that matches argument list best
         
         /* If the validMethod takes a custom object and the
          * request has this object, that's a win */
         $data = $request->getData();
         
-        foreach ($validMethods as $validMethod) {
+        foreach ($validMethods as $key=>$validMethod) {
           $parameters = $validMethod->getParameters();
           
-          if ((count($parameters) == 1 && $parameters[0]->getClass() !== NULL)
-           && (isset($data[$parameters[0]->getClass()]))) {
-            $found = $validMethod;
-            break;
+          if (count($parameters) == 1) {
+            $parameterClass = $parameters[0]->getClass();
+            
+            if ($parameterClass !== NULL) {
+              $className = strtolower($parameterClass->name);
+              
+              if (isset($data[$className])) {
+                $found = $validMethod;
+                break;
+              } else {
+                
+                // No longer a valid method
+                unset($validMethods[$key]);
+              }
+            }
           }
         }
         
@@ -279,46 +289,39 @@ class Server {
         if ($found === NULL) {
           
           /* If the validMethod takes a number of arguments that matches
-           * the named arguments of the request, that's also a win */
-          $data = $request->getData();
-          
-          foreach ($validMethods as $validMethod) {
-            $parameters = $validMethod->getParameters();
-            
-            if (count($parameters) == count($data)) {
-              $found = $validMethod;
-              break;
-            }
-          }
-        }
-        
-        // Nothing yet?
-        if ($found === NULL) {
-          
-          /* If the validMethod takes a number of arguments that matches
            * the named arguments of the request combined with the anonymous
-           * arguments, that's better than nothing */
-          $data = $request->getData();
-          $anonymousData = $request->getAnonymousData();
+           * arguments, that's also a win */
+          
+          // Number of valid methods may have changed
+          if (count($validMethods) > 0) {
+            if (count($validMethods) > 1) {
         
-          foreach ($validMethods as $validMethod) {
-            $parameters = $validMethod->getParameters();
+              /* If the validMethod takes a number of arguments that matches
+               * the named arguments of the request combined with the anonymous
+               * arguments, that's also a win */
+              $data = $request->getData();
+              $anonymousData = $request->getAnonymousData();
+              
+              foreach ($validMethods as $validMethod) {
+                $parameters = $validMethod->getParameters();
+                
+                if (count($parameters) == (count($data) + count($anonymousData))) {
+                  $found = $validMethod;
+                  break;
+                }
+              }
+            } else {
+              $found = array_shift($validMethods);
+            }
             
-            if (count($parameters) == (count($data) + count($anonymousData))) {
-              $found = $validMethod;
-              break;
+            // If none of the methods were a great match, lets just pick one
+            if ($found === NULL) {
+              $found = array_shift($validMethods);
             }
           }
         }
-        
-        /* No good matches? Well, then we just take the first match and hope
-         * for the best */
-        if ($found === NULL) {
-          $found = $validMethods[0];
-        }
-        
       } else {
-        $found = $validMethods[0];
+        $found = array_shift($validMethods);
       }
     }
     
