@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-require_once('addendum/annotations.php');
+require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 require_once('ServiceMethod.php');
 
 abstract class Service extends ReflectionAnnotatedClass {
@@ -43,15 +43,43 @@ abstract class Service extends ReflectionAnnotatedClass {
     
     // Service methods
     foreach ($this->getMethods() as $reflectionMethod) {
-      if (strtolower($reflectionMethod->name) == 'get'
-       || strtolower($reflectionMethod->name) == 'post'
-       || strtolower($reflectionMethod->name) == 'put'
-       || strtolower($reflectionMethod->name) == 'delete'
-       || strtolower($reflectionMethod->name) == 'any') {
-        
-        $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod);
+      $methodName = strtolower($reflectionMethod->name);
+      $httpMethods = array();
+      
+      if ($methodName == 'get'
+       || $methodName == 'post'
+       || $methodName == 'put'
+       || $methodName == 'delete'
+       || $methodName == 'any') {
+      
+        $httpMethods[] = $methodName;
+      }
+      
+      // Check for http method annotations
+      if ($reflectionMethod->hasAnnotation('Get')) {
+        $httpMethods[] = 'get';
+      }
+      if ($reflectionMethod->hasAnnotation('Post')) {
+        $httpMethods[] = 'post';
+      }
+      if ($reflectionMethod->hasAnnotation('Put')) {
+        $httpMethods[] = 'put';
+      }
+      if ($reflectionMethod->hasAnnotation('Delete')) {
+        $httpMethods[] = 'delete';
+      }
+      if ($reflectionMethod->hasAnnotation('Any')) {
+        $httpMethods[] = 'any';
+      }
+      
+      $httpMethods = array_unique($httpMethods);
+      
+      if (count($httpMethods) > 0) {
+        $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod,
+          $httpMethods);
       }
     }
+    
   }
   
   public function getRoute() {

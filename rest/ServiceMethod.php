@@ -19,21 +19,25 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-require_once('addendum/annotations.php');
+require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 
 class ServiceMethod extends ReflectionAnnotatedMethod {
   private $reflectionClass;
   private $requiresAuthentication;
   private $requiredAccessLevel;
   private $contentType;
+  private $httpMethods;
   
-  public function ServiceMethod(&$reflectionClass, &$reflectionMethod) {
+  public function ServiceMethod(&$reflectionClass,
+    &$reflectionMethod, $httpMethods) {
+    
     parent::__construct($reflectionMethod->class, $reflectionMethod->name);
     
     $this->reflectionClass = $reflectionClass;
     $this->requiresAuthentication = false;
     $this->requiredAccessLevel = 0;
     $this->contentType = 'text/plain';
+    $this->httpMethods = $httpMethods;
     
     // Annotations
     if ($this->hasAnnotation('Authenticated')) {
@@ -93,6 +97,10 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
   
   public function getContentType() {
     return $this->contentType;
+  }
+  
+  public function getHttpMethods() {
+    return $this->httpMethods;
   }
 }
 

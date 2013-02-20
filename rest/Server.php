@@ -25,7 +25,7 @@ require_once('Request.php');
 require_once('Annotations.php');
 require_once('Service.php');
 require_once('ServiceException.php');
-require_once('addendum/annotations.php');
+require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 
 class Server {
 
@@ -80,11 +80,11 @@ class Server {
     
       // See if service is specified
       if ($request->getService()) {
-        $service = $this->findService($request->getService());
+        $service = $this->findService($request);
           
         if ($service !== NULL) {
           
-          $method = $this->findMethod($service, $request->getMethod());
+          $method = $this->findMethod($service, $request);
           
           if ($method !== NULL) {
             
@@ -221,10 +221,11 @@ class Server {
   }
   
   // Find the service
-  private function findService($service) {
+  private function findService($request) {
     $found = NULL;
+    
     foreach ($this->services as &$s) {
-      if ($s->getRoute() == $service) {
+      if ($s->getRoute() == $request->getService()) {
         $found = $s;
         break;
       }
@@ -233,27 +234,94 @@ class Server {
   }
   
   // Check if the service has this method
-  private function findMethod(Service $service, $method) {
+  private function findMethod(Service $service, $request) {
     $found = NULL;
     $serviceMethods = $service->getServiceMethods();
+    
+    $method = $request->getMethod();
+    
+    $validMethods = array();
     foreach($serviceMethods as &$m) {
-      if (strtolower($m->getName()) == strtolower($method)) {
-        $found = $m;
-        break;
+      if (in_array(strtolower($method), $m->getHttpMethods())) {
+        $validMethods[] = $m;
       }
     }
     
-    // Last solution
-    if ($found === NULL) {
-      
-      // See if the service has an "any"-method we can use instead
+    // If no method match, look for any-methods
+    if (count($validMethods) == 0) {
       foreach($serviceMethods as &$m) {
-        if (strtolower($m->getName()) == 'any') {
-          $found = $m;
-          break;
+        if (in_array('any', $m->getHttpMethods())) {
+          $validMethods[] = $m;
         }
       }
     }
+    
+    if (count($validMethods) > 0) {
+      if (count($validMethods) > 1) {
+        
+        // Find the method that matches argument list best
+        
+        /* If the validMethod takes a custom object and the
+         * request has this object, that's a win */
+        $data = $request->getData();
+        
+        foreach ($validMethods as $validMethod) {
+          $parameters = $validMethod->getParameters();
+          
+          if ((count($parameters) == 1 && $parameters[0]->getClass() !== NULL)
+           && (isset($data[$parameters[0]->getClass()]))) {
+            $found = $validMethod;
+            break;
+          }
+        }
+        
+        // Search more?
+        if ($found === NULL) {
+          
+          /* If the validMethod takes a number of arguments that matches
+           * the named arguments of the request, that's also a win */
+          $data = $request->getData();
+          
+          foreach ($validMethods as $validMethod) {
+            $parameters = $validMethod->getParameters();
+            
+            if (count($parameters) == count($data)) {
+              $found = $validMethod;
+              break;
+            }
+          }
+        }
+        
+        // Nothing yet?
+        if ($found === NULL) {
+          
+          /* If the validMethod takes a number of arguments that matches
+           * the named arguments of the request combined with the anonymous
+           * arguments, that's better than nothing */
+          $data = $request->getData();
+          $anonymousData = $request->getAnonymousData();
+        
+          foreach ($validMethods as $validMethod) {
+            $parameters = $validMethod->getParameters();
+            
+            if (count($parameters) == (count($data) + count($anonymousData))) {
+              $found = $validMethod;
+              break;
+            }
+          }
+        }
+        
+        /* No good matches? Well, then we just take the first match and hope
+         * for the best */
+        if ($found === NULL) {
+          $found = $validMethods[0];
+        }
+        
+      } else {
+        $found = $validMethods[0];
+      }
+    }
+    
     return $found;
   }
   
@@ -289,6 +357,7 @@ class Server {
         $methodNames[] = strtolower($method->getName());
       }
       sort($methodNames);
+      $methodNames = array_unique($methodNames);
       
       foreach ($methodNames as $method) {
         $ret .= '<span class="method '.$method.'">'

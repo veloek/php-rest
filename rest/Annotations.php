@@ -20,11 +20,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
-require_once('addendum/annotations.php');
+require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 
 class Route extends Annotation {}
 class Authenticated extends Annotation {}
 class AccessLevel extends Annotation {}
 class ContentType extends Annotation {}
+class Get extends Annotation {}
+class Post extends Annotation {}
+class Put extends Annotation {}
+class Delete extends Annotation {}
+class Any extends Annotation {}
 
 ?>
