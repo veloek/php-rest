@@ -273,8 +273,13 @@ class TasksService extends Service {
     if ($id !== NULL) {
       if (isset($_SESSION['TASKS'][$id])) {
         
+        // Make a copy to return
+        $taskObject = $_SESSION['TASKS'][$id];
+
         // Remove the task from session data
         unset($_SESSION['TASKS'][$id]);
+
+        return json_encode($taskObject);
       } else {
         throw new ServiceException(HttpStatus::BAD_REQUEST,
           'Invalid task id');
