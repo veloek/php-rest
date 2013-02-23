@@ -31,9 +31,13 @@ $(function() {
 			withCredentials: true
 		},
 		success: function(result) {
-			$.each(result.tasks, function(i, task) {
-				addTaskToList(task);
-			});
+			if (result.tasks.length == 0) {
+				$("#message").text("No tasks in list. Add some!");
+			} else {
+				$.each(result.tasks, function(i, task) {
+					addTaskToList(task);
+				});
+			}
 		},
 		error: function(result) {
 			if (result.status == 404) {
@@ -61,6 +65,7 @@ $(function() {
 			success: function(result) {
 				$("#login").toggle("slow");
 				$("#logout").toggle("slow");
+				$("#message").text("");
 			},
 			error: function(result) {
 				if (result.status == 401) {
@@ -84,6 +89,7 @@ $(function() {
 			success: function(result) {
 				$("#login").toggle("slow");
 				$("#logout").toggle("slow");
+				$("#message").text("");
 			},
 			error: function(result) {
 				$("#message").text("Error while loggin out. Try again later.");
@@ -106,6 +112,7 @@ $(function() {
 			}),
 			success: function(result) {
 				addTaskToList(result);
+				$("#message").text("");
 			},
 			error: function(result) {
 				if (result.status == 401) {
@@ -118,7 +125,8 @@ $(function() {
 	});
 	
 	$("#tasks_container").on("click", ".del_task", function() {
-		var taskId = $(this).closest(".task").attr("id").substring(4);
+		var task = $(this).closest(".task");
+		var taskId = task.attr("id").substring(4);
 		var that = this;
 		$.ajax({
 			type: "DELETE",
@@ -127,7 +135,14 @@ $(function() {
 				withCredentials: true
 			},
 			success: function(result) {
-				$(that).toggle("slow").remove();
+				task.toggle("slow", function() {
+					task.remove();
+
+					if ($("#tasks_container").children().length == 0) {
+						$("#message").text("No tasks in list. Add some!");
+					}
+				});
+				$("#message").text("");
 			},
 			error: function(result) {
 				if (result.status == 401) {
@@ -140,12 +155,57 @@ $(function() {
 			}
 		});
 	});
+
+	$("#tasks_container").on("click", ".task_title", function() {
+		var html = $("<form class=\"change_title_form\"><input type=\"text\" class=\"change_title\" value=\""+$(this).text()+"\"/></form>");
+		$(this).hide().after(html);
+		html.children(".change_title").focus();
+	});
+
+	$("#tasks_container").on("submit", ".change_title_form", function(evt) {
+		evt.preventDefault();
+
+		var task = $(this).closest(".task");
+		var taskId = task.attr("id").substring(4);
+		var input = $(this).children(".change_title");
+		var that = this;
+		$.ajax({
+			type: "PUT",
+			url: BASE_PATH + "/tasks/" + taskId,
+			contentType: "application/json",
+			xhrFields: {
+				withCredentials: true
+			},
+			data: JSON.stringify({
+				task: $(input).val()
+			}),
+			success: function(result) {
+				task.children(".task_title").text(result.content);
+				$("#message").text("");
+			},
+			error: function(result) {
+				if (result.status == 401) {
+					$("#message").text("You must be logged in to edit tasks");
+				} else {
+					$("#message").text("Error while saving task. Try again later");
+				}
+			},
+			complete: function() {
+				task.children(".task_title").show();
+				$(that).remove();
+			}
+		});
+	});
+
+	$("#tasks_container").on("focusout", ".change_title", function() {
+		$(this).parent().submit();
+	});
 });
 
 function addTaskToList(task) {
 	var html =
 	$("<div id=\"tId_"+task.id+"\" class=\"task\">" +
-		"<h1>"+task.content+"</h1>" +
+		"<h1 class=\"task_title\">"+task.content+"</h1>" +
 		"<h2>Created by "+task.createdBy+"</h2>" +
 		"<div class=\"del_task\"></div>" +
 	"</div>");
