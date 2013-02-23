@@ -242,17 +242,10 @@ class Server {
     
     $validMethods = array();
     foreach($serviceMethods as &$m) {
-      if (in_array(strtolower($method), $m->getHttpMethods())) {
+      if (in_array(strtolower($method), $m->getHttpMethods())
+       || in_array('any', $m->getHttpMethods())) {
+        
         $validMethods[] = $m;
-      }
-    }
-    
-    // If no method match, look for any-methods
-    if (count($validMethods) == 0) {
-      foreach($serviceMethods as &$m) {
-        if (in_array('any', $m->getHttpMethods())) {
-          $validMethods[] = $m;
-        }
       }
     }
     
@@ -331,49 +324,65 @@ class Server {
   // When no route is specified, the output from this function is shown
   private function createIndex() {
     $ret = '
-    <style>
-    *{font-family: Helvetica, Arial}
-    li{margin:10px 0}
-    .method{width:50px;border-radius:5px;border:solid black 1px;margin:0 3px;padding: 2px;font-size: 0.9em;}
-    .get{background:#4DAB58}
-    .post{background:#CC9900}
-    .put{background:#3060F0}
-    .delete{background:#C03000}
-    .any{background:#F6358A}
-    </style>
-    <div style="width:500px;margin:0 auto">
-    <br>
-    <h2 style="text-decoration:underline;">
-    Welcome to <em>' . $this->serverName . '</em>
-    </h2>
-    <p>The following services are available:</p>
-    <ul>
+    <html>
+      <head>
+        <style>
+          * {font-family: Helvetica, Arial}
+          th {background-color:black}
+          tr:nth-child(odd) td {background-color: #ddd;}
+          td {text-align:center;}
+        </style>
+      </head>
+      <body>
+        <div style="width:500px;margin:0 auto">
+          <br>
+          <h2 style="text-decoration:underline;">
+            Welcome to <em>' . $this->serverName . '</em>
+          </h2>
+          <p>The following services are available:</p>
+          <table cellpadding="5" cellspacing="0" border="1">
+            <tr>
+              <th style="color: white">Service name</th>
+              <th style="color: white">Route</th>
+              <th style="background:#4DAB58">GET</th>
+              <th style="background:#CC9900">POST</th>
+              <th style="background:#3060F0">PUT</th>
+              <th style="background:#C03000">DELETE</th>
+              <th style="background:#F6358A">ANY</th>
+            </tr>
     ';
     
     // For each service; print out it's service methods
     foreach ($this->services as $service) {
-      $ret .= '<li>/<a href="'.$service->getRoute().'">' . $service->getRoute() . '</a> ';
-      
       $serviceMethods = $service->getServiceMethods();
-      $methodNames = array();
+      $httpMethods = array();
       foreach ($serviceMethods as $method) {
-        $methodNames[] = strtolower($method->getName());
+        foreach ($method->getHttpMethods() as $httpMethod) {
+          $httpMethods[] = strtolower($httpMethod);
+        }
       }
-      sort($methodNames);
-      $methodNames = array_unique($methodNames);
+      sort($httpMethods);
+      $httpMethods = array_unique($httpMethods);
       
-      foreach ($methodNames as $method) {
-        $ret .= '<span class="method '.$method.'">'
-              . strtoupper($method)
-              . '</span>';
-      }
-      $ret = substr($ret, 0, -2); // Remove last ,
-      
-      $ret .= '</li>';
+      $ret .= '
+            <tr>
+              <td style="text-align:left;">' . $service->getName() . '</td>
+              <td style="text-align:left;">
+              <a href="' . $service->getRoute() . '">
+              /' . $service->getRoute() . '
+              </a>
+              </td>
+              <td>' . (in_array('get', $httpMethods) ? 'X' : '-') . '</td>
+              <td>' . (in_array('post', $httpMethods) ? 'X' : '-') . '</td>
+              <td>' . (in_array('put', $httpMethods) ? 'X' : '-') . '</td>
+              <td>' . (in_array('delete', $httpMethods) ? 'X' : '-') . '</td>
+              <td>' . (in_array('any', $httpMethods) ? 'X' : '-') . '</td>
+            </tr>
+      ';
     }
     
     $ret .= '
-    </ul>
+    </table>
     <br>
     <p style="font-size:0.8em;"><em>This REST server is powered by
     <a href="https://github.com/veloek/php-rest">phpREST</a>
