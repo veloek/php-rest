@@ -1,1 +1,99 @@
-phpREST GitHub Page
+<html>
+	<head>
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="tasks.js"></script>
+		<style>
+			* {
+				font-family: arial;
+			}
+			body {
+				width: 500px;
+				margin: 20px auto;
+			}
+			h1 {
+				font-family: times, Times New Roman, times-roman, georgia, serif;
+				color: #444;
+				margin: 0;
+				padding: 0px 0px 6px 0px;
+				font-size: 51px;
+				line-height: 44px;
+				letter-spacing: -2px;
+				font-weight: bold;
+			}
+			a {
+				text-transform: none;
+			}
+			h2 {
+				font-family: Gill Sans, Verdana;
+				font-size: 11px;
+				line-height: 14px;
+				text-transform: uppercase;
+				letter-spacing: 2px;
+				font-weight: bold;
+			}
+			#task_input {
+				border-radius: 5px;
+			}
+			#add_task {
+
+			}
+			#tasks_container {
+				
+			}
+			#tasks_container .task {
+				border: dashed black 1px;
+				border-radius: 5px;
+				padding: 0 20px;
+				position: relative;
+				margin: 5px 0;
+			}
+			#tasks_container .task h1 {
+				font-family: verdana;
+				font-size: 1.3em;
+			}
+			#tasks_container .task h2 {
+			}
+			#tasks_container .task .del_task {
+				background-image: url('Delete.png');
+				background-size: contain;
+				position: absolute;
+				cursor: hand;
+				right: 10px;
+				top: 10px;
+				height: 25px;
+				width: 25px;
+			}
+			#message {
+				font-style: italic;
+				color: #888;
+				padding: 10px 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Tasks</h1>
+		<h2>An example of web services with <em><a href="https://github.com/veloek/php-rest">phpREST</a><em></h2>
+		<form id="login">
+			<table>
+				<tr>
+					<td>Username</td><td>Password</td><td></td>
+				</tr>
+				<tr>
+					<td><input id="username" type="text" placeholder="john"/></td>
+					<td><input id="password" type="text" placeholder="doe"/></td>
+					<td><input type="submit" value="Log in"/></td>
+				</tr>
+			</table>
+		</form>
+		<form id="logout" style="display:none;">
+			<input type="submit" value="Log out"/>
+		</form>
+		<form id="new_task">
+			<input id="task_input" type="text" placeholder="Add new task"/>
+			<input type="submit" value="Add task"/>
+		</form>
+		<div id="message"></div>
+		<div id="tasks_container">
+		</div>
+	</body>
+</html>
