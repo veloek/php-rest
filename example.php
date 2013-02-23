@@ -116,13 +116,9 @@ class AuthenticationService extends Service {
  * user for some of the methods. We distinguish between just authenticated
  * and authenticated with higher access level for some methods.
  *
- * A sharp reader may notice that the @Authenticated annotation is not
- * really needed when @AccessLevel is set in this particular example, since
- * @AccessLevel is never set without @Authenticated also being set.
- *
  * In this service we use some other session stored data to set and access
  * tasks. Only the root user may access the delete and put methods to because
- * of the @AccessLevel annotation. Everyone may get the tasks.
+ * of the AccessLevel annotation. Everyone may get the tasks.
  *
  * @Route('tasks')
  *
