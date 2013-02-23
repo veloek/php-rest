@@ -204,7 +204,7 @@ class TasksService extends Service {
     $taskObject->content = $task;
     
     // Add task object to storage
-    $_SESSION['TASKS'][] = $taskObject;
+    $_SESSION['TASKS'][$newId] = $taskObject;
     
     // Store last used id
     $_SESSION['LAST_ID'] = $newId;
