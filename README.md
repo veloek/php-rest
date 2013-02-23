@@ -3,9 +3,13 @@ phpREST
 
 A REST server implementation for simple setup of RESTful web services.
 
+<b>Demo</b><br>
 To demonstrate usage of the included example service, I've created a simple frontend with HTML and JavaScript doing ajax calls to the service. You can test it [here](http://veloek.github.com/php-rest/).
 
-<b>The simplest of examples</b>:
+<b>CORS</b><br>
+The REST server implementation tries to support [cors](http://www.html5rocks.com/en/tutorials/cors/) the best way it can, by adding proper headers to allow use of credentials and preflight requests.
+
+<b>The simplest of examples</b>
 
 ```php
 <?php
