@@ -1,9 +1,11 @@
 phpREST
 =======
 
-A REST implementation for simple setup of RESTful web services.
+A REST server implementation for simple setup of RESTful web services.
 
-<b>A simple example</b>:
+To demonstrate usage of the included example service, I've created a simple frontend with HTML and JavaScript doing ajax calls to the service. You can test it [here](http://veloek.github.com/php-rest/).
+
+<b>The simplest of examples</b>:
 
 ```php
 <?php
