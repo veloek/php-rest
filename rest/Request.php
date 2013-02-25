@@ -51,6 +51,10 @@ class Request {
         parse_str(file_get_contents("php://input"), $data);
       }
       
+      if (count($_FILES) > 0) {
+        $data = $data ? array_merge($_FILES, $data) : $_FILES;
+      }
+      
       $this->data = $data ? array_merge($_GET, $data) : $_GET;
     }
     
