@@ -1,6 +1,4 @@
 <?php
-require_once('rest/Server.php');
-
 /**
  * This web service demonstrates how to handle uploaded files
  * in form of 'multipart/form-data'.
