@@ -1,8 +1,6 @@
 <?php
-require_once('rest'.DIRECTORY_SEPARATOR.'Server.php');
-
 /**
- * example.php
+ * tasks.php
  *
  * This is an example of how to use the phpREST library.
  *
@@ -291,8 +289,7 @@ class TasksService extends Service {
   }
 }
 
-// We create an instance of the phpREST server implementation
-$server = new Server('Tasks Web Services');
+// The $server object is instantiated in index.php
 
 /**
  * Here we set the authenticated state and access level based
@@ -308,8 +305,5 @@ if (isset($_SESSION['ACCESS_LEVEL'])) {
 // We must register our services with phpREST
 $server->addService(new AuthenticationService());
 $server->addService(new TasksService());
-
-// Finally everything is set up and we can let phpREST handle the rest (getit?)
-$server->handleRequest();
 
 ?>

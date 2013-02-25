@@ -3,11 +3,11 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-s
 RewriteCond %{REQUEST_FILENAME} !-l 
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/example\.php$
-RewriteRule ^(.*)$ example.php/$1
+RewriteCond %{REQUEST_URI} !^/index\.php$
+RewriteRule ^(.*)$ index.php/$1
 
 # Set index file
-DirectoryIndex example.php
+DirectoryIndex index.php
 
 # Remove indexing
 Options -Indexes
