@@ -19,6 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
+ob_start();
 
 require_once('Response.php');
 require_once('Request.php');
@@ -420,6 +421,8 @@ class Server {
     }
     
     echo $this->response->getContent();
+    
+    ob_flush();
   }
 }
 
