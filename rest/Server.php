@@ -117,9 +117,11 @@ class Server {
                     
                     $requestObj = new $paramClassName();
                     $classVars = get_class_vars($paramClassName);
+                    $requestData = array_pop($data);
+                    
                     foreach ($classVars as $attr=>$defaultVal) {
-                      if (isset($data[strtolower($attr)])) {
-                        $requestObj->{$attr} = $data[strtolower($attr)];
+                      if (isset($requestData[strtolower($attr)])) {
+                        $requestObj->{$attr} = $requestData[strtolower($attr)];
                       }
                     }
                     
@@ -250,73 +252,117 @@ class Server {
       }
     }
     
-    // Find the method that matches argument list best
-    if (count($validMethods) > 0) {
-      if (count($validMethods) > 1) {
+    /* If more than one method for this HTTP method, find the
+     * method that matches argument list best */
+    if (count($validMethods) > 1) {
+      
+      /* If the validMethod takes a custom object and the
+       * request has this object, that's a win */
+      $data = $request->getData();
+      
+      foreach ($validMethods as $key=>$validMethod) {
+        $parameters = $validMethod->getParameters();
         
-        /* If the validMethod takes a custom object and the
-         * request has this object, that's a win */
-        $data = $request->getData();
-        
-        foreach ($validMethods as $key=>$validMethod) {
-          $parameters = $validMethod->getParameters();
+        if (count($parameters) == 1) {
+          $parameterClass = $parameters[0]->getClass();
           
-          if (count($parameters) == 1) {
-            $parameterClass = $parameters[0]->getClass();
+          if ($parameterClass !== NULL) {
+            $className = strtolower($parameterClass->name);
             
-            if ($parameterClass !== NULL) {
-              $className = strtolower($parameterClass->name);
+            if (isset($data[$className]) && is_array($data[$className])) {
+              $found = $validMethod;
+              break;
+            } else {
               
-              if (isset($data[$className])) {
-                $found = $validMethod;
-                break;
-              } else {
-                
-                // No longer a valid method
-                unset($validMethods[$key]);
-              }
+              // No longer a valid method
+              unset($validMethods[$key]);
             }
           }
         }
-        
-        // Search more?
-        if ($found === NULL) {
+      }
+      
+      // Search more?
+      if ($found === NULL) {
           
-          /* If the validMethod takes a number of arguments that matches
-           * the named arguments of the request combined with the anonymous
-           * arguments, that's also a win */
-          
-          // Number of valid methods may have changed
-          if (count($validMethods) > 0) {
-            if (count($validMethods) > 1) {
+        /* If the validMethod takes arguments that matches
+         * the named arguments of the request, that's also a win */
         
-              /* If the validMethod takes a number of arguments that matches
-               * the named arguments of the request combined with the anonymous
-               * arguments, that's also a win */
-              $data = $request->getData();
-              $anonymousData = $request->getAnonymousData();
+        // Number of valid methods may have changed
+        if (count($validMethods) > 1) {
+          
+          $data = $request->getData();
+          $anonymousData = $request->getAnonymousData();
+          
+          $numMatches = 0;
+          $bestFit = NULL;
+          
+          foreach ($validMethods as $validMethod) {
+            $parameters = $validMethod->getParameters();
+            
+            foreach ($data as $argument=>$value) {
+              $cnt = 0;
               
-              foreach ($validMethods as $validMethod) {
-                $parameters = $validMethod->getParameters();
+              foreach ($parameters as $reflectionParameter)
+              {
+                if ($reflectionParameter->name == $argument) $cnt++;
+              }
+            }
+            
+            if ($cnt > $numMatches) {
+              $numMatches = $cnt;
+              $bestFit = $validMethod;
+            }
+          }
+          
+          /* If we had a method with one or more argument matches, we
+           * pick that. If not we use the one with the most fitting
+           * number of arguments */
+          if ($bestFit !== NULL) {
+            $found = $bestFit;
+          } else {
+            
+            $numberOfArguments = count($data) + count($anonymousData);
+            
+            $miss = 1000;
+            $bestFit = NULL;
+            
+            foreach ($validMethods as $validMethod) {
+              $parameters = $validMethod->getParameters();
+              
+              $off = abs(count($parameters) - $numberOfArguments);
+              
+              if ($off < $miss) {
+                $miss = $off;
+                $bestFit = $validMethod;
+              } else if ($off == $miss && $miss > 0) {
                 
-                if (count($parameters) == (count($data) + count($anonymousData))) {
-                  $found = $validMethod;
-                  break;
+                /* If this validMethod has optional parameters, that
+                 * may make this method preferrable */
+                
+                foreach ($parameters as $reflectionParameter) {
+                  if ($reflectionParameter->isOptional()) $off--;
                 }
               }
-            } else {
-              $found = array_shift($validMethods);
+              
+              if ($off < $miss) {
+                $miss = $off;
+                $bestFit = $validMethod;
+              }
             }
             
-            // If none of the methods were a great match, lets just pick one
-            if ($found === NULL) {
-              $found = array_shift($validMethods);
+            if ($bestFit !== NULL) {
+              $found = $bestFit;
             }
           }
         }
-      } else {
-        $found = array_shift($validMethods);
+          
+        // If none of the methods were a great match, lets just pick one
+        if ($found === NULL) {
+          $found = array_shift($validMethods);
+        }
       }
+    } else if (count($validMethods) > 0) {
+      $found = array_shift($validMethods);
     }
     
     return $found;
