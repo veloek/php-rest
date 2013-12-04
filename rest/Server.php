@@ -118,6 +118,7 @@ class Server {
                     $requestObj = new $paramClassName();
                     $classVars = get_class_vars($paramClassName);
                     $requestData = array_pop($data);
+                    $requestData = array_change_key_case($requestData);
                     
                     foreach ($classVars as $attr=>$defaultVal) {
                       if (isset($requestData[strtolower($attr)])) {
