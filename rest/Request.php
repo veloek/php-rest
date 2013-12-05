@@ -42,7 +42,7 @@ class Request {
       
     } else { // POST, PUT, DELETE
       
-      if (@$_SERVER['CONTENT_TYPE'] == 'application/json') {
+      if (@preg_match('/application\/json/i', $_SERVER['CONTENT_TYPE'])) {
         
         $data = json_decode(file_get_contents('php://input'), true);
         
