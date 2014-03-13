@@ -62,7 +62,7 @@ class HttpStatus {
   const SERVICE_UNAVAILABLE = 503;
   const GATEWAY_TIMEOUT = 504;
   const HTTP_VERSION_NOT_SUPPORTED = 505;
-  
+
   public static function getMessage($statusCode) {
     switch ($statusCode) {
       case self::CONT: return 'Continue';

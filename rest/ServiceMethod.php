@@ -27,29 +27,29 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
   private $requiredAccessLevel;
   private $contentType;
   private $httpMethods;
-  
+
   public function ServiceMethod(&$reflectionClass,
     &$reflectionMethod, $httpMethods) {
-    
+
     parent::__construct($reflectionMethod->class, $reflectionMethod->name);
-    
+
     $this->reflectionClass = $reflectionClass;
     $this->requiresAuthentication = false;
     $this->requiredAccessLevel = 0;
     $this->contentType = 'text/plain';
     $this->httpMethods = $httpMethods;
-    
+
     // Annotations
     if ($this->hasAnnotation('Authenticated')) {
       $this->requiresAuthentication = true;
     } else {
-      
+
       // Check if service class has global settings
       if ($this->reflectionClass->hasAnnotation('Authenticated')) {
         $this->requiresAuthentication = true;
       }
     }
-    
+
     if ($this->hasAnnotation('AccessLevel')) {
       $annotation = $this->getAnnotation('AccessLevel');
       $value = intval($annotation->value);
@@ -57,7 +57,7 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
         $this->requiredAccessLevel = $value;
       }
     } else {
-      
+
       // Check if service class has global settings
       if ($this->reflectionClass->hasAnnotation('AccessLevel')) {
         $annotation = $this->reflectionClass->getAnnotation('AccessLevel');
@@ -67,7 +67,7 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
         }
       }
     }
-    
+
     if ($this->hasAnnotation('ContentType')) {
       $annotation = $this->getAnnotation('ContentType');
       $value = $annotation->value;
@@ -75,7 +75,7 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
         $this->contentType = $value;
       }
     } else {
-      
+
       // Check if service class has global settings
       if ($this->reflectionClass->hasAnnotation('ContentType')) {
         $annotation = $this->reflectionClass->getAnnotation('ContentType');
@@ -90,15 +90,15 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
   public function requiresAuthentication() {
     return $this->requiresAuthentication;
   }
-  
+
   public function requiredAccessLevel() {
     return $this->requiredAccessLevel;
   }
-  
+
   public function getContentType() {
     return $this->contentType;
   }
-  
+
   public function getHttpMethods() {
     return $this->httpMethods;
   }

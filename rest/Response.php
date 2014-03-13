@@ -19,11 +19,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 require_once('HttpStatus.php');
 
 class Response {
-  
+
   private $content;
   private $contentType;
   private $httpStatus;
@@ -33,7 +33,7 @@ class Response {
                            $httpStatus = HttpStatus::OK,
                            $contentType = 'text/plain',
                            $charset = 'utf-8') {
-    
+
     $this->content = $content;
     $this->contentType = $contentType;
     $this->httpStatus = $httpStatus;

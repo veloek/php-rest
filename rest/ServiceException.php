@@ -22,10 +22,10 @@
 class ServiceException extends Exception {
   public function ServiceException($code, $message=NULL) {
     if ($message === NULL) $message = HttpStatus::getMessage($code);
-    
+
     parent::__construct($message, $code);
   }
-  
+
   public function __toString() {
     return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
   }

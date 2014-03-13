@@ -19,65 +19,65 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 class Request {
-  
+
   private $method;
   private $service;
   private $data;
   private $anonymousData;
-  
+
   public function Request($phpRequest) {
-    
+
     $this->method = @$_SERVER['REQUEST_METHOD'] ? $_SERVER['REQUEST_METHOD'] : '';
-    
+
     $requestPath = explode("/", substr(@$_SERVER['PATH_INFO'], 1));
     $this->service = @$requestPath[0] ? $requestPath[0] : '';
-    
+
     $this->anonymousData = self::removeEmptyStrings(array_slice($requestPath, 1));
-    
+
     if ($this->getMethod() == 'GET') {
-      
+
       $this->data = $_GET;
-      
+
     } else { // POST, PUT, DELETE
-      
+
       if (@preg_match('/application\/json/i', $_SERVER['CONTENT_TYPE'])) {
-        
+
         $data = json_decode(file_get_contents('php://input'), true);
-        
+
       } else {
-        
+
         parse_str(file_get_contents("php://input"), $data);
       }
-      
+
       if (count($_FILES) > 0) {
         $data = $data ? array_merge($_FILES, $data) : $_FILES;
       }
-      
+
       $this->data = $data ? array_merge($_GET, $data) : $_GET;
     }
-    
+
     // Case insensitive to match better
     $this->data = array_change_key_case($this->data, CASE_LOWER);
   }
-  
+
   public function getMethod() {
     return $this->method;
   }
-  
+
   public function getService() {
     return $this->service;
   }
-  
+
   public function getData() {
     return $this->data;
   }
-  
+
   public function getAnonymousData() {
     return $this->anonymousData;
   }
-  
+
   private static function removeEmptyStrings($arr) {
     if (is_array($arr)) {
       foreach ($arr as $key=>$val) {
@@ -86,7 +86,7 @@ class Request {
     }
     return $arr;
   }
-  
+
 }
 
 ?>

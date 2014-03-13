@@ -19,20 +19,20 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
- 
+
 require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 require_once('ServiceMethod.php');
 
 abstract class Service extends ReflectionAnnotatedClass {
   private $route;
   private $serviceMethods;
-  
+
   public function Service() {
     $className = get_class($this);
     parent::__construct($className);
     $this->route = $className;
     $this->serviceMethods = array();
-    
+
     // Annotations
     if ($this->hasAnnotation('Route')) {
       $annotation = $this->getAnnotation('Route');
@@ -40,21 +40,21 @@ abstract class Service extends ReflectionAnnotatedClass {
         $this->route = $annotation->value;
       }
     }
-    
+
     // Service methods
     foreach ($this->getMethods() as $reflectionMethod) {
       $methodName = strtolower($reflectionMethod->name);
       $httpMethods = array();
-      
+
       if ($methodName == 'get'
        || $methodName == 'post'
        || $methodName == 'put'
        || $methodName == 'delete'
        || $methodName == 'any') {
-      
+
         $httpMethods[] = $methodName;
       }
-      
+
       // Check for http method annotations
       if ($reflectionMethod->hasAnnotation('Get')) {
         $httpMethods[] = 'get';
@@ -71,21 +71,21 @@ abstract class Service extends ReflectionAnnotatedClass {
       if ($reflectionMethod->hasAnnotation('Any')) {
         $httpMethods[] = 'any';
       }
-      
+
       $httpMethods = array_unique($httpMethods);
-      
+
       if (count($httpMethods) > 0) {
         $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod,
           $httpMethods);
       }
     }
-    
+
   }
-  
+
   public function getRoute() {
     return $this->route;
   }
-  
+
   public function getServiceMethods() {
     return $this->serviceMethods;
   }
