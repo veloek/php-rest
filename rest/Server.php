@@ -117,14 +117,17 @@ class Server {
 
                     $requestObj = new $paramClassName();
                     $classVars = get_class_vars($paramClassName);
-                    $requestData = array_pop($data);
 
-                    if (is_array($requestData)) {
-                      $requestData = array_change_key_case($requestData);
+                    // Request ex: {"user":{"name":"a","pass":"b"}}
+                    if (array_diff_key($data, $classVars) && count($data) === 1)
+                      $data = array_pop($data);
+
+                    if (is_array($data)) {
+                      $data = array_change_key_case($data);
 
                       foreach ($classVars as $attr=>$defaultVal) {
-                        if (isset($requestData[strtolower($attr)])) {
-                          $requestObj->{$attr} = $requestData[strtolower($attr)];
+                        if (isset($data[strtolower($attr)])) {
+                          $requestObj->{$attr} = $data[strtolower($attr)];
                         }
                       }
                     }
