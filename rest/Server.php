@@ -134,7 +134,7 @@ class Server {
 
                     try {
                       $result = $method->invoke($service, $requestObj);
-                    } catch (ServiceException $e) {
+                    } catch (Exception $e) {
                       $result = $e;
                     }
 
@@ -181,14 +181,14 @@ class Server {
 
                     try {
                       $result = $method->invokeArgs($service, $input);
-                    } catch (ServiceException $e) {
+                    } catch (Exception $e) {
                       $result = $e;
                     }
                   }
                 } else {
                   try {
                     $result = $method->invoke($service);
-                  } catch (ServiceException $e) {
+                  } catch (Exception $e) {
                     $result = $e;
                   }
                 }
