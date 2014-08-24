@@ -69,7 +69,8 @@ class Server {
   }
 
   public function addService(Service $service) {
-    if (count($service->getServiceMethods()) > 0)
+    if ((count($service->getServiceMethods()) +
+        count($service->getSubroutes())) > 0)
       $this->services[] = $service;
   }
 
@@ -247,6 +248,37 @@ class Server {
   private function findMethod(Service $service, $request) {
     $found = NULL;
     $serviceMethods = $service->getServiceMethods();
+
+    // Check if any subroutes are useable
+    $subroutes = $service->getSubroutes();
+    krsort($subroutes);
+
+    $anonymousData = $request->getAnonymousData();
+
+    foreach ($subroutes as $subroute=>$serviceMethod) {
+      $routeArr = explode('/', $subroute);
+
+      $match = TRUE;
+      foreach ($routeArr as $i=>$part) {
+        if (@$anonymousData[$i] !== $part) {
+          $match = FALSE;
+          break;
+        }
+      }
+
+      if ($match) {
+        $serviceMethods = array();
+
+        foreach ($subroutes as $r=>$m) {
+          if ($r === $subroute)
+            $serviceMethods[] = $m;
+        }
+
+        $request->setAnonymousData(array_slice($anonymousData, count($routeArr)));
+
+        break;
+      }
+    }
 
     $method = $request->getMethod();
 

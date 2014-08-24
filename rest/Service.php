@@ -26,12 +26,14 @@ require_once('ServiceMethod.php');
 abstract class Service extends ReflectionAnnotatedClass {
   private $route;
   private $serviceMethods;
+  private $subroutes;
 
   public function Service() {
     $className = get_class($this);
     parent::__construct($className);
     $this->route = $className;
     $this->serviceMethods = array();
+    $this->subroutes = array();
 
     // Annotations
     if ($this->hasAnnotation('Route')) {
@@ -74,9 +76,22 @@ abstract class Service extends ReflectionAnnotatedClass {
 
       $httpMethods = array_unique($httpMethods);
 
+      $subroute = NULL;
+      if ($reflectionMethod->hasAnnotation('Subroute')) {
+        $subrouteAnnotation = $reflectionMethod->getAnnotation('Subroute');
+        if ($subrouteAnnotation->value) {
+          $subroute = $subrouteAnnotation->value;
+        }
+      }
+
       if (count($httpMethods) > 0) {
-        $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod,
-          $httpMethods);
+        if ($subroute)
+          $this->subroutes[$subroute] = new ServiceMethod($this,
+                                                          $reflectionMethod,
+                                                          $httpMethods);
+        else
+          $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod,
+                                                      $httpMethods);
       }
     }
 
@@ -88,6 +103,10 @@ abstract class Service extends ReflectionAnnotatedClass {
 
   public function getServiceMethods() {
     return $this->serviceMethods;
+  }
+
+  public function getSubroutes() {
+    return $this->subroutes;
   }
 }
 

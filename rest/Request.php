@@ -78,6 +78,10 @@ class Request {
     return $this->anonymousData;
   }
 
+  public function setAnonymousData($anonymousData) {
+    $this->anonymousData = $anonymousData;
+  }
+
   private static function removeEmptyStrings($arr) {
     if (is_array($arr)) {
       foreach ($arr as $key=>$val) {
