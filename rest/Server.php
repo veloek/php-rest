@@ -259,8 +259,15 @@ class Server {
       $routeArr = explode('/', $subroute);
 
       $match = TRUE;
+      $placeHolders = array();
       foreach ($routeArr as $i=>$part) {
-        if (@$anonymousData[$i] !== $part) {
+        $isPlaceholder = ((substr($part, 0, 1) === '{') &&
+                          (substr($part, -1) === '}'));
+
+        if ($isPlaceholder) $placeHolders[] = $i;
+
+        if (@$anonymousData[$i] !== $part &&
+            !(isset($anonymousData[$i]) && $isPlaceholder)) {
           $match = FALSE;
           break;
         }
@@ -274,7 +281,14 @@ class Server {
             $serviceMethods[] = $m;
         }
 
-        $request->setAnonymousData(array_slice($anonymousData, count($routeArr)));
+        $tmpArr = array();
+        foreach ($placeHolders as $ph) {
+          $tmpArr[] = $anonymousData[$ph];
+        }
+
+        $newArr = array_slice($anonymousData, count($routeArr));
+
+        $request->setAnonymousData(array_merge($tmpArr, $newArr));
 
         break;
       }
