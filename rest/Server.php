@@ -351,10 +351,9 @@ class Server {
 
           foreach ($validMethods as $validMethod) {
             $parameters = $validMethod->getParameters();
+            $cnt = 0;
 
             foreach ($data as $argument=>$value) {
-              $cnt = 0;
-
               foreach ($parameters as $reflectionParameter)
               {
                 if ($reflectionParameter->name == $argument) $cnt++;
