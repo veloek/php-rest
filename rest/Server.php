@@ -255,7 +255,7 @@ class Server {
 
     $anonymousData = $request->getAnonymousData();
 
-    foreach ($subroutes as $subroute=>$serviceMethod) {
+    foreach ($subroutes as $subroute=>$subrouteMethods) {
       $routeArr = explode('/', $subroute);
 
       $match = TRUE;
@@ -278,7 +278,7 @@ class Server {
 
         foreach ($subroutes as $r=>$m) {
           if ($r === $subroute)
-            $serviceMethods[] = $m;
+            $serviceMethods = array_merge($serviceMethods, $m);
         }
 
         $tmpArr = array();

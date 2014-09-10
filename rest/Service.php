@@ -85,13 +85,17 @@ abstract class Service extends ReflectionAnnotatedClass {
       }
 
       if (count($httpMethods) > 0) {
-        if ($subroute)
-          $this->subroutes[$subroute] = new ServiceMethod($this,
+        if ($subroute) {
+          if (!isset($this->subroutes[$subroute]))
+            $this->subroutes[$subroute] = array();
+
+          $this->subroutes[$subroute][] = new ServiceMethod($this,
                                                           $reflectionMethod,
                                                           $httpMethods);
-        else
+        } else {
           $this->serviceMethods[] = new ServiceMethod($this, $reflectionMethod,
                                                       $httpMethods);
+        }
       }
     }
 
