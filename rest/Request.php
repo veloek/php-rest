@@ -31,7 +31,8 @@ class Request {
 
     $this->method = @$_SERVER['REQUEST_METHOD'] ? $_SERVER['REQUEST_METHOD'] : '';
 
-    $requestPath = explode("/", substr(@$_SERVER['PATH_INFO'], 1));
+    $pathInfo = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+    $requestPath = explode("/", substr($pathInfo, 1));
     $this->service = @$requestPath[0] ? $requestPath[0] : '';
 
     $this->anonymousData = self::removeEmptyStrings(array_slice($requestPath, 1));
