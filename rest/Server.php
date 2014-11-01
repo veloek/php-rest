@@ -120,7 +120,8 @@ class Server {
                     $classVars = get_class_vars($paramClassName);
 
                     // Request ex: {"user":{"name":"a","pass":"b"}}
-                    if (count($data) === 1 && is_array(array_values($data)[0]))
+                    $arrayValues = array_values($data);
+                    if (count($data) === 1 && is_array($arrayValues[0]))
                       $data = array_pop($data);
 
                     if (is_array($data)) {
