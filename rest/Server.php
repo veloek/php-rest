@@ -480,7 +480,7 @@ class Server {
       ';
     }
 
-    $version = @include('VERSION');
+    $version = @file_get_contents('VERSION', TRUE);
     $ret .= '
     </table>
     <br>
