@@ -103,5 +103,3 @@ class ServiceMethod extends ReflectionAnnotatedMethod {
     return $this->httpMethods;
   }
 }
-
-?>

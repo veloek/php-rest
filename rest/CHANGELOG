@@ -1,11 +1,15 @@
-0.1.0
-- Started with versioning
+0.1.4
+- Bugfixing subroutes
+- Minor refactoring
 
-0.1.1
-- Improvements on request parsing
+0.1.3
+- Fix exception handling
 
 0.1.2
 - Bugfix
 
-0.1.3
-- Fix exception handling
+0.1.1
+- Improvements on request parsing
+
+0.1.0
+- Started with versioning

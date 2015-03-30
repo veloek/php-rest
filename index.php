@@ -18,5 +18,3 @@ require_once('examples' . DIRECTORY_SEPARATOR . 'upload_file.php');
 require_once('examples' . DIRECTORY_SEPARATOR . 'crowded.php');
 
 $server->handleRequest();
-
-?>

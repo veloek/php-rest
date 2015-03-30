@@ -42,49 +42,49 @@ class AuthenticationService extends Service {
    * @Post
    */
   public function login($username, $password) {
-    
+
     // Throw a bad request if username or password is missing
     if ($username === NULL || $password === NULL) {
-      throw new ServiceException(HttpStatus::BAD_REQUEST, 
+      throw new ServiceException(HttpStatus::BAD_REQUEST,
         'Both username and password are needed');
     }
-    
+
     // We have two sets of username/password we check against
     if (($username == 'root' && $password == 'god')
      || ($username == 'john' && $password == 'doe')) {
-      
+
       // Login OK, now store some information
       $_SESSION['USERNAME'] = $username;
-      
+
       // Root has higher access level than john
       if ($username == 'root') {
         $_SESSION['ACCESS_LEVEL'] = 3;
       } else {
         $_SESSION['ACCESS_LEVEL'] = 1;
       }
-      
+
       /* Give a response stating that the login was successful by
        * calling the same method that a GET request would have reached.
        */
       return $this->getUserInformation();
     } else {
-      
+
       // Throw an unauthorized if the credentials are wrong
       throw new ServiceException(HttpStatus::UNAUTHORIZED,
         'Wrong username and/or password');
     }
   }
-  
+
   /**
    * Here we have the "get user information" service that only returns
    * data with no input.
    *
    * If no user is logged in, we throw a 401 Unauthorized error.
-   * 
+   *
    * @Get
    */
   public function getUserInformation() {
-    
+
     // Check if user is logged in
     if (isset($_SESSION['USERNAME'])) {
       return 'Logged in as "' . $_SESSION['USERNAME'] . '" '
@@ -94,7 +94,7 @@ class AuthenticationService extends Service {
         'Not logged in');
     }
   }
-  
+
   /**
    * This DELETE method doesn't take any input, it only removes
    * login information
@@ -103,10 +103,10 @@ class AuthenticationService extends Service {
    */
   public function logout() {
     if (isset($_SESSION['USERNAME'])) unset($_SESSION['USERNAME']);
-    
+
     if (isset($_SESSION['ACCESS_LEVEL'])) unset($_SESSION['ACCESS_LEVEL']);
   }
-  
+
 }
 
 /**
@@ -137,34 +137,34 @@ class TasksService extends Service {
    */
   public function get($id) {
     if (isset($_SESSION['TASKS']) && is_array($_SESSION['TASKS'])) {
-      
+
       // If id is present and valid, return only that task
       if ($id !== NULL) {
         if (isset($_SESSION['TASKS'][$id])) {
-          
+
           // Return task object in json format
-          return json_encode($_SESSION['TASKS'][$id]); 
+          return json_encode($_SESSION['TASKS'][$id]);
         } else {
-          
+
           // Invalid input id calls for an error message
           throw new ServiceException(HttpStatus::BAD_REQUEST,
             'Invalid task id');
         }
       } else {
-        
+
         // No id specified, return all tasks
         $tasks = array();
         foreach ($_SESSION['TASKS'] as $task) {
           $tasks[] = $task;
         }
-        
+
         // Return an object which contains the array of tasks
         $ret = new stdClass;
         $ret->tasks = $tasks;
         return json_encode($ret);
       }
     } else {
-      
+
       // If we have no session data with tasks, we just return a not found
       throw new ServiceException(HttpStatus::NOT_FOUND,
         'No tasks stored');
@@ -182,60 +182,60 @@ class TasksService extends Service {
    * @Authenticated
    */
   public function post($task='No content') {
-    
+
     // If no tasks are stored, we initialize the storage array
     if (!isset($_SESSION['TASKS'])) {
       $_SESSION['TASKS'] = array();
     }
-    
+
     // Find new id to use
     $newId = isset($_SESSION['LAST_ID']) ? $_SESSION['LAST_ID'] + 1 : 0;
-    
+
     $taskObject = new stdClass();
-    
+
     $taskObject->id = $newId;
     $taskObject->createdBy = $_SESSION['USERNAME'];
     $taskObject->content = $task;
-    
+
     // Add task object to storage
     $_SESSION['TASKS'][$newId] = $taskObject;
-    
+
     // Store last used id
     $_SESSION['LAST_ID'] = $newId;
-    
+
     // Return newly added task
     return json_encode($taskObject); // Return in json format
   }
-  
+
   /**
    * Updates a currently stored task
-   * 
+   *
    * Example paths:
    * /tasks/1/Updated%20task
    * /tasks/1?task=Updated%20task
    * /tasks?id=1&task=Updated%20task
    * /tasks/1 (with PUT-data: {"task": "Updated task"})
    * /tasks (with PUT-data: {"id": 1, "task": "Updated task"})
-   * 
+   *
    * @Authenticated
    */
   public function put($id, $task) {
-    
+
     // If no tasks are stored, we don't have anything to update
     if (!isset($_SESSION['TASKS'])) {
       throw new ServiceException(HttpStatus::NOT_FOUND,
         'No tasks stored yet');
     }
-    
+
     // We must have a valid id to update the task
     if ($id !== NULL) {
       if (isset($_SESSION['TASKS'][$id])) {
-        
+
         // Update task if input is given
         if ($task !== NULL) {
           $_SESSION['TASKS'][$id]->content = $task;
         }
-        
+
         // Return updated task
         return json_encode($_SESSION['TASKS'][$id]);
       } else {
@@ -247,7 +247,7 @@ class TasksService extends Service {
         'Missing task id');
     }
   }
-  
+
   /**
    * Deletes a currently stored task
    *
@@ -255,22 +255,22 @@ class TasksService extends Service {
    * /tasks/1
    * /tasks?id=1
    * /tasks (with DELETE-data: {"id": 1})
-   * 
+   *
    * @Authenticated
    * @AccessLevel(3) // Only root user may delete tasks
    */
   public function delete($id) {
-    
+
     // If no tasks are stored, we don't have anything to delete
     if (!isset($_SESSION['TASKS'])) {
       throw new ServiceException(HttpStatus::NOT_FOUND,
         'No tasks stored yet');
     }
-    
+
     // We must have a valid id to delete the task
     if ($id !== NULL) {
       if (isset($_SESSION['TASKS'][$id])) {
-        
+
         // Make a copy to return
         $taskObject = $_SESSION['TASKS'][$id];
 
@@ -305,5 +305,3 @@ if (isset($_SESSION['ACCESS_LEVEL'])) {
 // We must register our services with phpREST
 $server->addService(new AuthenticationService());
 $server->addService(new TasksService());
-
-?>

@@ -113,5 +113,3 @@ abstract class Service extends ReflectionAnnotatedClass {
     return $this->subroutes;
   }
 }
-
-?>

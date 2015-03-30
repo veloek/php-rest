@@ -32,5 +32,3 @@ class Put extends Annotation {}
 class Delete extends Annotation {}
 class Any extends Annotation {}
 class Subroute extends Annotation {}
-
-?>

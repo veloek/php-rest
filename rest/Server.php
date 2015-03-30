@@ -525,5 +525,3 @@ class Server {
     ob_flush();
   }
 }
-
-?>
