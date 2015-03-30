@@ -16,5 +16,6 @@ $server = new Server("phpREST Example Web Services");
 require_once('examples' . DIRECTORY_SEPARATOR . 'tasks.php');
 require_once('examples' . DIRECTORY_SEPARATOR . 'upload_file.php');
 require_once('examples' . DIRECTORY_SEPARATOR . 'crowded.php');
+require_once('examples' . DIRECTORY_SEPARATOR . 'subroutes.php');
 
 $server->handleRequest();
