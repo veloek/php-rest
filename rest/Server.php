@@ -134,8 +134,12 @@ class Server {
                       }
                     }
 
+                    // Combine object and anonymous data (for subroutes)
+                    $input = array_merge(array($requestObj),
+                                         $request->getAnonymousData());
+
                     try {
-                      $result = $method->invoke($service, $requestObj);
+                      $result = $method->invokeArgs($service, $input);
                     } catch (Exception $e) {
                       $result = $e;
                     }
@@ -275,12 +279,7 @@ class Server {
       }
 
       if ($match) {
-        $serviceMethods = array();
-
-        foreach ($subroutes as $r=>$m) {
-          if ($r === $subroute)
-            $serviceMethods = array_merge($serviceMethods, $m);
-        }
+        $serviceMethods = $subroutes[$subroute];
 
         $tmpArr = array();
         foreach ($placeHolders as $ph) {
@@ -481,11 +480,13 @@ class Server {
       ';
     }
 
+    $version = @include('VERSION');
     $ret .= '
     </table>
     <br>
     <p style="font-size:0.8em;"><em>This REST server is powered by
     <a href="https://github.com/veloek/php-rest">phpREST</a>
+    ' . $version . '
     </em>
     </p>
     </div>
