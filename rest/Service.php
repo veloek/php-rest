@@ -80,7 +80,7 @@ abstract class Service extends ReflectionAnnotatedClass {
       if ($reflectionMethod->hasAnnotation('Subroute')) {
         $subrouteAnnotation = $reflectionMethod->getAnnotation('Subroute');
         if ($subrouteAnnotation->value) {
-          $subroute = $subrouteAnnotation->value;
+          $subroute = preg_replace('/{[^}]*}/', '{}', $subrouteAnnotation->value);
         }
       }
 
