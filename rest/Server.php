@@ -259,6 +259,7 @@ class Server {
     krsort($subroutes);
 
     $anonymousData = $request->getAnonymousData();
+    $method = $request->getMethod();
 
     foreach ($subroutes as $subroute=>$subrouteMethods) {
       $routeArr = explode('/', $subroute);
@@ -279,28 +280,36 @@ class Server {
       }
 
       if ($match) {
-        $serviceMethods = $subroutes[$subroute];
-
-        $tmpArr = array();
-        foreach ($placeHolders as $ph) {
-          $tmpArr[] = $anonymousData[$ph];
+        $hasMethod = FALSE;
+        foreach ($subroutes[$subroute] as $m) {
+          if (in_array(strtolower($method), $m->getHttpMethods()) ||
+              in_array('any', $m->getHttpMethods())) {
+            $hasMethod = TRUE;
+            break;
+          }
         }
 
-        $newArr = array_slice($anonymousData, count($routeArr));
+        if ($hasMethod) {
+          $serviceMethods = $subroutes[$subroute];
 
-        $request->setAnonymousData(array_merge($tmpArr, $newArr));
+          $tmpArr = array();
+          foreach ($placeHolders as $ph) {
+            $tmpArr[] = $anonymousData[$ph];
+          }
 
-        break;
+          $newArr = array_slice($anonymousData, count($routeArr));
+
+          $request->setAnonymousData(array_merge($tmpArr, $newArr));
+
+          break;
+        }
       }
     }
 
-    $method = $request->getMethod();
-
     $validMethods = array();
     foreach($serviceMethods as &$m) {
-      if (in_array(strtolower($method), $m->getHttpMethods())
-       || in_array('any', $m->getHttpMethods())) {
-
+      if (in_array(strtolower($method), $m->getHttpMethods()) ||
+          in_array('any', $m->getHttpMethods())) {
         $validMethods[] = $m;
       }
     }
