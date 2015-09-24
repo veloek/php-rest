@@ -202,7 +202,16 @@ class Server {
                 if ($result instanceof Exception) {
                   if ($result instanceof ServiceException) {
                     $this->response->setHttpStatus($result->getCode());
-                    $this->response->setContent($result->getMessage());
+
+                    $message = $result->getMessage();
+
+                    // If content type is json, make it json friendly
+                    if ($method->getContentType() === 'application/json') {
+                      $this->response->setContentType('application/json');
+                      $message = sprintf('{"error": "%s"}', $message);
+                    }
+
+                    $this->response->setContent($message);
                   } else {
                     $this->response->setHttpStatus(
                       HttpStatus::INTERNAL_SERVER_ERROR);
@@ -523,7 +532,7 @@ class Server {
             header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
     }
 
-    if ($httpStatus !== 200) {
+    if ($httpStatus !== 200 && $httpContentType !== 'application/json') {
       $str = $httpStatus
            . ' ' . HttpStatus::getMessage($httpStatus) . "\n";
       echo $str;
