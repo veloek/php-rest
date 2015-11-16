@@ -31,13 +31,15 @@ require_once('addendum'.DIRECTORY_SEPARATOR.'annotations.php');
 class Server {
 
   private $serverName;
+  private $showIndex;
   private $services;
   private $response;
   private $authenticated;
   private $accessLevel;
 
-  public function Server($serverName='phpREST Services') {
+  public function Server($serverName='phpREST Services', $showIndex=TRUE) {
     $this->serverName = $serverName;
+    $this->showIndex = $showIndex;
     $this->services = array();
     $this->response = new Response();
     $this->authenticated = false;
@@ -237,8 +239,12 @@ class Server {
           $this->response->setHttpStatus(HttpStatus::NOT_FOUND);
         }
       } else {
-        $this->response->setContentType('text/html');
-        $this->response->setContent($this->createIndex());
+        if ($this->showIndex) {
+          $this->response->setContentType('text/html');
+          $this->response->setContent($this->createIndex());
+        } else {
+          $this->response->setHttpStatus(HttpStatus::NOT_FOUND);
+        }
       }
     }
 
