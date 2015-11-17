@@ -523,6 +523,7 @@ class Server {
     $httpStatus = $this->response->getHttpStatus();
     $httpContentType = $this->response->getContentType();
     $charset = $this->response->getCharset();
+    $content = $this->response->getContent();
 
     $httpStatusHeader = 'HTTP/1.1 ' . $httpStatus . ' ';
     $httpStatusHeader .= HttpStatus::getMessage($httpStatus);
@@ -535,14 +536,18 @@ class Server {
     header('Access-Control-Allow-Headers: Content-Type, Origin, Accept');
     header('Access-Control-Allow-Credentials: true');
     if (array_key_exists('HTTP_ORIGIN', $_SERVER)) {
-            header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+      header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
     }
 
     if ($httpStatus !== 200 && $httpContentType !== 'application/json') {
       echo $httpStatus . ' ';
+
+      if (!$content) {
+        echo HttpStatus::getMessage($httpStatus);
+      }
     }
 
-    echo $this->response->getContent();
+    echo $content;
 
     ob_flush();
   }
