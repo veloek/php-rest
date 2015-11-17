@@ -539,9 +539,7 @@ class Server {
     }
 
     if ($httpStatus !== 200 && $httpContentType !== 'application/json') {
-      $str = $httpStatus
-           . ' ' . HttpStatus::getMessage($httpStatus) . "\n";
-      echo $str;
+      echo $httpStatus . ' ';
     }
 
     echo $this->response->getContent();
