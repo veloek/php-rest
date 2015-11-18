@@ -535,7 +535,10 @@ class Server {
 
       // If content type is json, make the message json friendly
       if ($httpContentType === 'application/json') {
-        printf('{"status": %d, "error": "%s"}', $httpStatus, $content);
+        echo json_encode((object)array(
+            'status' => $httpStatus,
+            'error' => $content
+        ));
       } else {
         echo $httpStatus . ' ' . $content;
       }
