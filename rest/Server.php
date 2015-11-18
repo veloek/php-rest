@@ -92,6 +92,9 @@ class Server {
 
           if ($method !== NULL) {
 
+            // Set method's content type
+            $this->response->setContentType($method->getContentType());
+
             // Check for use of annotation @Authenticated
             if (!$method->requiresAuthentication()
              || ($method->requiresAuthentication() && $this->isAuthenticated())) {
@@ -204,27 +207,14 @@ class Server {
                 if ($result instanceof Exception) {
                   if ($result instanceof ServiceException) {
                     $this->response->setHttpStatus($result->getCode());
-
-                    $message = $result->getMessage();
-
-                    // If content type is json, make it json friendly
-                    if ($method->getContentType() === 'application/json') {
-                      $this->response->setContentType('application/json');
-                      $message = sprintf('{"error": "%s"}', $message);
-                    }
-
-                    $this->response->setContent($message);
                   } else {
                     $this->response->setHttpStatus(
                       HttpStatus::INTERNAL_SERVER_ERROR);
-                    $this->response->setContent($result->getMessage());
                   }
-                } else {
-                  $this->response->setContentType($method->getContentType());
 
-                  if ($result !== NULL) {
-                    $this->response->setContent($result);
-                  }
+                  $this->response->setContent($result->getMessage());
+                } else if ($result !== NULL) {
+                  $this->response->setContent($result);
                 }
               } else {
                 $this->response->setHttpStatus(HttpStatus::METHOD_NOT_ALLOWED);
@@ -539,15 +529,19 @@ class Server {
       header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
     }
 
-    if ($httpStatus !== 200 && $httpContentType !== 'application/json') {
-      echo $httpStatus . ' ';
+    if ($httpStatus !== 200) {
 
-      if (!$content) {
-        echo HttpStatus::getMessage($httpStatus);
+      if (!$content) $content = HttpStatus::getMessage($httpStatus);
+
+      // If content type is json, make the message json friendly
+      if ($httpContentType === 'application/json') {
+        printf('{"status": %d, "error": "%s"}', $httpStatus, $content);
+      } else {
+        echo $httpStatus . ' ' . $content;
       }
+    } else {
+      echo $content;
     }
-
-    echo $content;
 
     ob_flush();
   }
