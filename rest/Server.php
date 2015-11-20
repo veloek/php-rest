@@ -124,11 +124,6 @@ class Server {
                     $requestObj = new $paramClassName();
                     $classVars = get_class_vars($paramClassName);
 
-                    // Request ex: {"user":{"name":"a","pass":"b"}}
-                    $arrayValues = array_values($data);
-                    if (count($data) === 1 && is_array($arrayValues[0]))
-                      $data = array_pop($data);
-
                     if (is_array($data)) {
                       $data = array_change_key_case($data);
 
@@ -523,7 +518,7 @@ class Server {
 
     // Enable cors
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Origin, Accept');
+    header('Access-Control-Allow-Headers: Content-Type, Origin, Accept, Authorization');
     header('Access-Control-Allow-Credentials: true');
     if (array_key_exists('HTTP_ORIGIN', $_SERVER)) {
       header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
