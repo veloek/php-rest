@@ -32,6 +32,12 @@ class Request {
     $this->method = @$_SERVER['REQUEST_METHOD'] ? $_SERVER['REQUEST_METHOD'] : '';
 
     $pathInfo = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+
+    // Get pathInfo from query param if necessary (fast cgi)
+    if ($pathInfo === '' && count($_GET) > 0) {
+      $pathInfo = array_shift(@array_keys($_GET));
+    }
+
     $requestPath = explode("/", substr($pathInfo, 1));
     $this->service = @$requestPath[0] ? $requestPath[0] : '';
 
